@@ -1,2 +1,2 @@
-# EZMQ-Management-Server-Go
-EZMQ management server micro service for Go language
+# ezmq-topic-name-service-go
+EZMQ topic name management micro service for Go language
