@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2017 Samsung Electronics All Rights Reserved.
+ * Copyright 2018 Samsung Electronics All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,28 +14,15 @@
  * limitations under the License.
  *
  *******************************************************************************/
- 
- package tns
- 
- import (
-	"encoding/json"
-	"errors"
-	"fmt"
-	"io/ioutil"
-	"log"
-	"net/http"
-	"os"
-	"path/filepath"
-	"strconv"
-	"strings"
-	"time"
+package main
 
+import (
+	"api"
+	"commons/logger"
 )
 
-
-
 func main() {
-
-// TO DO
-//implement server
+	logger.Logging(logger.DEBUG, "Start Topic Naming Space server")
+	api.RunNodeWebServer("0.0.0.0", 49048)
+	logger.Logging(logger.DEBUG, "Stop Topic Naming Space server")
 }
