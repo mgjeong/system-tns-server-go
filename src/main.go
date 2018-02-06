@@ -17,12 +17,7 @@
 package main
 
 import (
-	"api"
-	"commons/logger"
 )
 
 func main() {
-	logger.Logging(logger.DEBUG, "Start Topic Naming Space server")
-	api.RunNodeWebServer("0.0.0.0", 49048)
-	logger.Logging(logger.DEBUG, "Stop Topic Naming Space server")
 }
