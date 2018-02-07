@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2018 Samsung Electronics All Rights Reserved.
+ * Copyright 2017 Samsung Electronics All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +14,28 @@
  * limitations under the License.
  *
  *******************************************************************************/
-package main
+ 
+ package tns
+ 
+ import (
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io/ioutil"
+	"log"
+	"net/http"
+	"os"
+	"path/filepath"
+	"strconv"
+	"strings"
+	"time"
 
-import (
 )
 
+
+
 func main() {
+
+// TO DO
+//implement server
 }
