@@ -23,8 +23,8 @@ ENV APP_PORT=48111
 ENV APP=tns
 
 # install MongoDB
-RUN apk add --no-cache mongodb bash && \
-    rm -rf /var/cache/apk/*
+#RUN apk add --no-cache mongodb bash && \
+#    rm -rf /var/cache/apk/*
 
 # copy files
 #COPY $APP run.sh $APP_DIR/
@@ -37,8 +37,7 @@ EXPOSE $APP_PORT
 WORKDIR $APP_DIR
 
 # make mongodb volume
-RUN mkdir /data
-RUN mkdir /data/db
+RUN mkdir /data && mkdir /data/db
 VOLUME /data/db
 
 #kick off the tns container
