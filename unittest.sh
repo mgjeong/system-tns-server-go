@@ -16,6 +16,4 @@ for pkg in "${pkg_list[@]}"; do
  count=$count.0
 done
 
-go tool cover -func=coverage.out
-go tool cover -html=coverage.out -o coverall.html
 
