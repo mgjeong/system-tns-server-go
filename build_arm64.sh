@@ -36,9 +36,12 @@ function build(){
 }
 
 function download_pkgs(){
-    pkg_list=()
+    pkg_list=(
+		"-u github.com/go-sql-driver/mysql"
+		)
 
-    idx=1
+
+    dx=1
     for pkg in "${pkg_list[@]}"; do
         echo -ne "(${idx}/${#pkg_list[@]}) go get $pkg"
         go get $pkg
