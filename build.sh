@@ -27,7 +27,7 @@ function func_cleanup(){
 }
 
 function build(){
-    CGO_ENABLED=0 GOOS=linux go build -o tns-server -a -ldflags '-extldflags "-static"'  src/main.go
+    CGO_ENABLED=0 GOOS=linux go build -o tns-server -a -ldflags '-extldflags "-static"'  src/main/main.go
     if [ $? -ne 0 ]; then
         echo -e "\n\033[31m"build fail"\033[0m"
         func_cleanup
@@ -36,7 +36,9 @@ function build(){
 }
 
 function download_pkgs(){
-    pkg_list=()
+    pkg_list=(
+		"-u github.com/go-sql-driver/mysql"
+		)
 
     idx=1
     for pkg in "${pkg_list[@]}"; do
