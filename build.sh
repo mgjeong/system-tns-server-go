@@ -37,7 +37,10 @@ function build(){
 
 function download_pkgs(){
     pkg_list=(
-		"-u github.com/go-sql-driver/mysql"
+#		"-u github.com/go-sql-driver/mysql"
+    "github.com/BurntSushi/toml"
+		"gopkg.in/mgo.v2"
+		"github.com/gorilla/mux"
 		)
 
     idx=1

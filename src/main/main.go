@@ -14,76 +14,121 @@
  * limitations under the License.
  *
  *******************************************************************************/
+
 package main
 
-    import (
-        _ "github.com/go-sql-driver/mysql"
-        "database/sql"
-        "fmt"
-    )
+import (
+	"encoding/json"
+	"log"
+	"net/http"
 
-    func main() {
-        db, err := sql.Open("mysql", "root:password@/tnsDB?charset=utf8")
-        checkErr(err)
+	"gopkg.in/mgo.v2/bson"
 
-        // insert
-        stmt, err := db.Prepare("INSERT TNSserver SET topic=?,endpoint=?,service_id=?")
-        checkErr(err)
+	"github.com/gorilla/mux"
+	. "config"
+	. "tns_model"
+	. "db/mongo"
+)
 
-        res, err := stmt.Exec("/SEVT/1F3C/N12/visiontester112/", "112.1.12.143:8455", "device-service112[].k{")
-        checkErr(err)
+var config = Config{}
+var dao = MoviesDAO{}
 
-        id, err := res.LastInsertId()
-        checkErr(err)
+// GET list of movies
+func AllMoviesEndPoint(w http.ResponseWriter, r *http.Request) {
+	movies, err := dao.FindAll()
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+	respondWithJson(w, http.StatusOK, movies)
+}
 
-        fmt.Println(id)
-        // update
-        stmt, err = db.Prepare("update TNSserver set topic=? where uid=?")
-        checkErr(err)
+// GET a movie by its ID
+func FindMovieEndpoint(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	movie, err := dao.FindById(params["id"])
+	if err != nil {
+		respondWithError(w, http.StatusBadRequest, "Invalid Movie ID")
+		return
+	}
+	respondWithJson(w, http.StatusOK, movie)
+}
 
-        res, err = stmt.Exec("/SEVT/2F43G/N11/raw-datas/", id)
-        checkErr(err)
+// POST a new movie
+func CreateMovieEndPoint(w http.ResponseWriter, r *http.Request) {
+	defer r.Body.Close()
+	var movie Movie
+	if err := json.NewDecoder(r.Body).Decode(&movie); err != nil {
+		respondWithError(w, http.StatusBadRequest, "Invalid request payload")
+		return
+	}
+	movie.ID = bson.NewObjectId()
+	if err := dao.Insert(movie); err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+	respondWithJson(w, http.StatusCreated, movie)
+}
 
-        affect, err := res.RowsAffected()
-        checkErr(err)
+// PUT update an existing movie
+func UpdateMovieEndPoint(w http.ResponseWriter, r *http.Request) {
+	defer r.Body.Close()
+	var movie Movie
+	if err := json.NewDecoder(r.Body).Decode(&movie); err != nil {
+		respondWithError(w, http.StatusBadRequest, "Invalid request payload")
+		return
+	}
+	if err := dao.Update(movie); err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+	respondWithJson(w, http.StatusOK, map[string]string{"result": "success"})
+}
 
-        fmt.Println(affect)
+// DELETE an existing movie
+func DeleteMovieEndPoint(w http.ResponseWriter, r *http.Request) {
+	defer r.Body.Close()
+	var movie Movie
+	if err := json.NewDecoder(r.Body).Decode(&movie); err != nil {
+		respondWithError(w, http.StatusBadRequest, "Invalid request payload")
+		return
+	}
+	if err := dao.Delete(movie); err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+	respondWithJson(w, http.StatusOK, map[string]string{"result": "success"})
+}
 
-        // query
-        rows, err := db.Query("SELECT * FROM TNSserver")
-        checkErr(err)
+func respondWithError(w http.ResponseWriter, code int, msg string) {
+	respondWithJson(w, code, map[string]string{"error": msg})
+}
 
-        for rows.Next() {
-            var uid int
-            var topic string
-            var endpoint string
-            var service_id string
-            err = rows.Scan(&uid, &topic, &endpoint, &service_id)
-            checkErr(err)
-            fmt.Println(uid)
-            fmt.Println(topic)
-            fmt.Println(endpoint)
-            fmt.Println(service_id)
-        }
+func respondWithJson(w http.ResponseWriter, code int, payload interface{}) {
+	response, _ := json.Marshal(payload)
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(code)
+	w.Write(response)
+}
 
-        // delete
-        stmt, err = db.Prepare("delete from TNSserver where uid=?")
-        checkErr(err)
+// Parse the configuration file 'config.toml', and establish a connection to DB
+func init() {
+	config.Read()
 
-        res, err = stmt.Exec(id)
-        checkErr(err)
+	dao.Server = config.Server
+	dao.Database = config.Database
+	dao.Connect()
+}
 
-        affect, err = res.RowsAffected()
-        checkErr(err)
-
-        fmt.Println(affect)
-
-        db.Close()
-
-    }
-
-    func checkErr(err error) {
-        if err != nil {
-            panic(err)
-        }
-    }
+// Define HTTP request routes
+func main() {
+	r := mux.NewRouter()
+	r.HandleFunc("/movies", AllMoviesEndPoint).Methods("GET")
+	r.HandleFunc("/movies", CreateMovieEndPoint).Methods("POST")
+	r.HandleFunc("/movies", UpdateMovieEndPoint).Methods("PUT")
+	r.HandleFunc("/movies", DeleteMovieEndPoint).Methods("DELETE")
+	r.HandleFunc("/movies/{id}", FindMovieEndpoint).Methods("GET")
+	if err := http.ListenAndServe(":3000", r); err != nil {
+		log.Fatal(err)
+	}
+}
