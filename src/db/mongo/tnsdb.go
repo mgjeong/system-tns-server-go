@@ -15,7 +15,7 @@
  *
  *******************************************************************************/
 
-package dao
+package tns
 
 import (
 	"log"
@@ -25,7 +25,7 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
-type MoviesDAO struct {
+type TNSserver struct {
 	Server   string
 	Database string
 }
@@ -33,11 +33,11 @@ type MoviesDAO struct {
 var db *mgo.Database
 
 const (
-	COLLECTION = "movies"
+	COLLECTION = "tns"
 )
 
 // Establish a connection to database
-func (m *MoviesDAO) Connect() {
+func (m *TNSserver) Connect() {
 	session, err := mgo.Dial(m.Server)
 	if err != nil {
 		log.Fatal(err)
@@ -45,36 +45,36 @@ func (m *MoviesDAO) Connect() {
 	db = session.DB(m.Database)
 }
 
-// Find list of movies
-func (m *MoviesDAO) FindAll() ([]Movie, error) {
-	var movies []Movie
-	err := db.C(COLLECTION).Find(bson.M{}).All(&movies)
-	return movies, err
+// Find topic list of TNS Server
+func (m *TNSserver) FindAll() ([]TNSdata, error) {
+	var tns []TNSdata
+	err := db.C(COLLECTION).Find(bson.M{}).All(&tns)
+	return tns, err
 }
 
-// Find a movie by its id
-func (m *MoviesDAO) FindById(id string) (Movie, error) {
-	var movie Movie
-	err := db.C(COLLECTION).FindId(bson.ObjectIdHex(id)).One(&movie)
-	return movie, err
+// Find a topic list by its topic
+func (m *TNSserver) FindById(id string) (TNSdata, error) {
+	var tns TNSdata
+	err := db.C(COLLECTION).FindId(bson.ObjectIdHex(id)).One(&tns)
+	return tns, err
 }
 
-// Insert a movie into database
-func (m *MoviesDAO) Insert(movie Movie) error {
-	err := db.C(COLLECTION).Insert(&movie)
+// Insert a topic list into database
+func (m *TNSserver) Insert(tns TNSdata) error {
+	err := db.C(COLLECTION).Insert(&tns)
 	return err
 }
 
-// Delete an existing movie
-func (m *MoviesDAO) Delete(movie Movie) error {
-	err := db.C(COLLECTION).Remove(&movie)
+// Delete an existing topic list
+func (m *TNSserver) Delete(tns TNSdata) error {
+	err := db.C(COLLECTION).Remove(&tns)
 	return err
 }
 
-// Update an existing movie
-func (m *MoviesDAO) Update(movie Movie) error {
-	err := db.C(COLLECTION).UpdateId(movie.ID, &movie)
+// Update an existing topic list
+func (m *TNSserver) Update(tns TNSdata) error {
+//	err := db.C(COLLECTION).UpdateId(movie.ID, &tns)
+	err := db.C(COLLECTION).UpdateId(tns.ID, &tns)
 	return err
 }
-
 

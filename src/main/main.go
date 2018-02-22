@@ -21,9 +21,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
-
 	"gopkg.in/mgo.v2/bson"
-
 	"github.com/gorilla/mux"
 	. "config"
 	. "tns_model"
@@ -31,69 +29,70 @@ import (
 )
 
 var config = Config{}
-var dao = MoviesDAO{}
+var tns = TNSserver{}
 
-// GET list of movies
-func AllMoviesEndPoint(w http.ResponseWriter, r *http.Request) {
-	movies, err := dao.FindAll()
-	if err != nil {
+// GET list of tns topics
+func AllTNSServerList(w http.ResponseWriter, r *http.Request) {
+	  tnsdata, err := tns.FindAll()
+		if err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
-	respondWithJson(w, http.StatusOK, movies)
+	respondWithJson(w, http.StatusOK, tnsdata)
 }
 
-// GET a movie by its ID
-func FindMovieEndpoint(w http.ResponseWriter, r *http.Request) {
+// GET a list by its topic
+func FindTNSList(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
-	movie, err := dao.FindById(params["id"])
+	tnsdata, err := tns.FindById(params["id"])
 	if err != nil {
-		respondWithError(w, http.StatusBadRequest, "Invalid Movie ID")
+		respondWithError(w, http.StatusBadRequest, "Invalid topic")
 		return
 	}
-	respondWithJson(w, http.StatusOK, movie)
+	// TO DO error check for all cases				
+	respondWithJson(w, http.StatusOK, tnsdata)
 }
 
-// POST a new movie
-func CreateMovieEndPoint(w http.ResponseWriter, r *http.Request) {
+// POST a new list
+func CreateTopicList(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
-	var movie Movie
-	if err := json.NewDecoder(r.Body).Decode(&movie); err != nil {
+	var tnsdata TNSdata
+	if err := json.NewDecoder(r.Body).Decode(&tnsdata); err != nil {
 		respondWithError(w, http.StatusBadRequest, "Invalid request payload")
 		return
 	}
-	movie.ID = bson.NewObjectId()
-	if err := dao.Insert(movie); err != nil {
+	tnsdata.ID = bson.NewObjectId()
+	if err := tns.Insert(tnsdata); err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
-	respondWithJson(w, http.StatusCreated, movie)
+	respondWithJson(w, http.StatusCreated, tnsdata)
 }
 
-// PUT update an existing movie
-func UpdateMovieEndPoint(w http.ResponseWriter, r *http.Request) {
+// PUT update an existing lists
+func UpdateTopicList(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
-	var movie Movie
-	if err := json.NewDecoder(r.Body).Decode(&movie); err != nil {
+	var tnsdata TNSdata
+	if err := json.NewDecoder(r.Body).Decode(&tnsdata); err != nil {
 		respondWithError(w, http.StatusBadRequest, "Invalid request payload")
 		return
 	}
-	if err := dao.Update(movie); err != nil {
+	if err := tns.Update(tnsdata); err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 	respondWithJson(w, http.StatusOK, map[string]string{"result": "success"})
 }
 
-// DELETE an existing movie
-func DeleteMovieEndPoint(w http.ResponseWriter, r *http.Request) {
+// DELETE an existing lists
+func DeleteTNSList(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
-	var movie Movie
-	if err := json.NewDecoder(r.Body).Decode(&movie); err != nil {
+	var tnsdata TNSdata
+	if err := json.NewDecoder(r.Body).Decode(&tnsdata); err != nil {
 		respondWithError(w, http.StatusBadRequest, "Invalid request payload")
 		return
 	}
-	if err := dao.Delete(movie); err != nil {
+	if err := tns.Delete(tnsdata); err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -115,20 +114,20 @@ func respondWithJson(w http.ResponseWriter, code int, payload interface{}) {
 func init() {
 	config.Read()
 
-	dao.Server = config.Server
-	dao.Database = config.Database
-	dao.Connect()
+	tns.Connect()
+	tns.Database = config.Database
+	tns.Connect()
 }
 
 // Define HTTP request routes
 func main() {
 	r := mux.NewRouter()
-	r.HandleFunc("/movies", AllMoviesEndPoint).Methods("GET")
-	r.HandleFunc("/movies", CreateMovieEndPoint).Methods("POST")
-	r.HandleFunc("/movies", UpdateMovieEndPoint).Methods("PUT")
-	r.HandleFunc("/movies", DeleteMovieEndPoint).Methods("DELETE")
-	r.HandleFunc("/movies/{id}", FindMovieEndpoint).Methods("GET")
-	if err := http.ListenAndServe(":3000", r); err != nil {
+	r.HandleFunc("/tnsdb", AllTNSServerList).Methods("GET")
+	r.HandleFunc("/tnsdb", CreateTopicList).Methods("POST")
+	r.HandleFunc("/tnsdb", UpdateTopicList).Methods("PUT")
+	r.HandleFunc("/tnsdb", DeleteTNSList).Methods("DELETE")
+	r.HandleFunc("/tnsdb/{topic}", FindTNSList).Methods("GET")
+	if err := http.ListenAndServe(":8323", r); err != nil {
 		log.Fatal(err)
 	}
 }
