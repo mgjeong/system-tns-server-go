@@ -127,7 +127,7 @@ func main() {
 	r.HandleFunc("/tnsdb", UpdateTopicList).Methods("PUT")
 	r.HandleFunc("/tnsdb", DeleteTNSList).Methods("DELETE")
 	r.HandleFunc("/tnsdb/{topic}", FindTNSList).Methods("GET")
-	if err := http.ListenAndServe(":8323", r); err != nil {
+	if err := http.ListenAndServe(":" + config.Port, r); err != nil {
 		log.Fatal(err)
 	}
 }

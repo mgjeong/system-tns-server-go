@@ -1,2 +1,3 @@
 server="localhost"
+port="8323"
 database="tns_db"
