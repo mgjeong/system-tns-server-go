@@ -26,6 +26,7 @@ import (
 // Represents database server and credentials
 type Config struct {
 	Server   string
+	Port	 string
 	Database string
 }
 
