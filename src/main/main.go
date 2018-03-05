@@ -14,76 +14,120 @@
  * limitations under the License.
  *
  *******************************************************************************/
+
 package main
 
-    import (
-        _ "github.com/go-sql-driver/mysql"
-        "database/sql"
-        "fmt"
-    )
+import (
+	"encoding/json"
+	"log"
+	"net/http"
+	"gopkg.in/mgo.v2/bson"
+	"github.com/gorilla/mux"
+	. "config"
+	. "tns_model"
+	. "db/mongo"
+)
 
-    func main() {
-        db, err := sql.Open("mysql", "root:password@/tnsDB?charset=utf8")
-        checkErr(err)
+var config = Config{}
+var tns = TNSserver{}
 
-        // insert
-        stmt, err := db.Prepare("INSERT TNSserver SET topic=?,endpoint=?,service_id=?")
-        checkErr(err)
+// GET list of tns topics
+func AllTNSServerList(w http.ResponseWriter, r *http.Request) {
+	  tnsdata, err := tns.FindAll()
+		if err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+	respondWithJson(w, http.StatusOK, tnsdata)
+}
 
-        res, err := stmt.Exec("/SEVT/1F3C/N12/visiontester112/", "112.1.12.143:8455", "device-service112[].k{")
-        checkErr(err)
+// GET a list by its topic
+func FindTNSList(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	tnsdata, err := tns.FindById(params["id"])
+	if err != nil {
+		respondWithError(w, http.StatusBadRequest, "Invalid topic")
+		return
+	}
+	// TO DO error check for all cases				
+	respondWithJson(w, http.StatusOK, tnsdata)
+}
 
-        id, err := res.LastInsertId()
-        checkErr(err)
+// POST a new list
+func CreateTopicList(w http.ResponseWriter, r *http.Request) {
+	defer r.Body.Close()
+	var tnsdata TNSdata
+	if err := json.NewDecoder(r.Body).Decode(&tnsdata); err != nil {
+		respondWithError(w, http.StatusBadRequest, "Invalid request payload")
+		return
+	}
+	tnsdata.ID = bson.NewObjectId()
+	if err := tns.Insert(tnsdata); err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+	respondWithJson(w, http.StatusCreated, tnsdata)
+}
 
-        fmt.Println(id)
-        // update
-        stmt, err = db.Prepare("update TNSserver set topic=? where uid=?")
-        checkErr(err)
+// PUT update an existing lists
+func UpdateTopicList(w http.ResponseWriter, r *http.Request) {
+	defer r.Body.Close()
+	var tnsdata TNSdata
+	if err := json.NewDecoder(r.Body).Decode(&tnsdata); err != nil {
+		respondWithError(w, http.StatusBadRequest, "Invalid request payload")
+		return
+	}
+	if err := tns.Update(tnsdata); err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+	respondWithJson(w, http.StatusOK, map[string]string{"result": "success"})
+}
 
-        res, err = stmt.Exec("/SEVT/2F43G/N11/raw-datas/", id)
-        checkErr(err)
+// DELETE an existing lists
+func DeleteTNSList(w http.ResponseWriter, r *http.Request) {
+	defer r.Body.Close()
+	var tnsdata TNSdata
+	if err := json.NewDecoder(r.Body).Decode(&tnsdata); err != nil {
+		respondWithError(w, http.StatusBadRequest, "Invalid request payload")
+		return
+	}
+	if err := tns.Delete(tnsdata); err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+	respondWithJson(w, http.StatusOK, map[string]string{"result": "success"})
+}
 
-        affect, err := res.RowsAffected()
-        checkErr(err)
+func respondWithError(w http.ResponseWriter, code int, msg string) {
+	respondWithJson(w, code, map[string]string{"error": msg})
+}
 
-        fmt.Println(affect)
+func respondWithJson(w http.ResponseWriter, code int, payload interface{}) {
+	response, _ := json.Marshal(payload)
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(code)
+	w.Write(response)
+}
 
-        // query
-        rows, err := db.Query("SELECT * FROM TNSserver")
-        checkErr(err)
+// Parse the configuration file 'config.toml', and establish a connection to DB
+func init() {
+	config.Read()
 
-        for rows.Next() {
-            var uid int
-            var topic string
-            var endpoint string
-            var service_id string
-            err = rows.Scan(&uid, &topic, &endpoint, &service_id)
-            checkErr(err)
-            fmt.Println(uid)
-            fmt.Println(topic)
-            fmt.Println(endpoint)
-            fmt.Println(service_id)
-        }
+	tns.Connect()
+	tns.Database = config.Database
+	tns.Connect()
+}
 
-        // delete
-        stmt, err = db.Prepare("delete from TNSserver where uid=?")
-        checkErr(err)
-
-        res, err = stmt.Exec(id)
-        checkErr(err)
-
-        affect, err = res.RowsAffected()
-        checkErr(err)
-
-        fmt.Println(affect)
-
-        db.Close()
-
-    }
-
-    func checkErr(err error) {
-        if err != nil {
-            panic(err)
-        }
-    }
+// Define HTTP request routes
+func main() {
+	r := mux.NewRouter()
+	r.HandleFunc("/tnsdb", AllTNSServerList).Methods("GET")
+	r.HandleFunc("/tnsdb", CreateTopicList).Methods("POST")
+	r.HandleFunc("/tnsdb", UpdateTopicList).Methods("PUT")
+	r.HandleFunc("/tnsdb", DeleteTNSList).Methods("DELETE")
+	r.HandleFunc("/tnsdb/{topic}", FindTNSList).Methods("GET")
+	if err := http.ListenAndServe(":8323", r); err != nil {
+		log.Fatal(err)
+	}
+}
