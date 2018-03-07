@@ -1,0 +1,140 @@
+swagger: '2.0'
+info:
+  title: TNS Server REST APIs
+  description: >-
+    TNS Server REST APIs
+  version: v1-20180307
+schemes:
+  - http
+tags:
+  - name: REST APIs
+    description: TNS REST APIs
+
+paths:
+  '/localhost:8323/tnsdb/discoverall':
+    get:
+      tags:
+        - REST APIs
+      description: |
+        Request get all lists of tnsdb
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: All tns data get succeeds
+          schema:
+            $ref: '#/definitions/response_of_discoverall'
+  '/localhost:8323/tnsdb/topic_register':
+    post:
+      tags:
+        - REST APIs
+      description: |
+        register topic
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: topic
+          in: path
+          description: topic for register
+          required: true
+          type: string
+        - name: endpoint
+          in: path
+          description: endpoint(IP,port) of publisher
+          required: true
+          type: string
+        - name: service_id
+          in: path
+          description: Service ID of publisher
+          required: true
+          type: string          
+      responses:
+        '200':
+          description: Topic register Succeed
+  '/localhost:8323/tnsdb/topic_resolution':
+    get:
+      tags:
+        - REST APIs
+      description: |
+        Topic Resolution 
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: topic
+          in: path
+          description: topic for resolution
+          required: true
+          type: string
+      responses:
+        '200':
+          description: resolution succeeds
+          schema:
+            $ref: '#/definitions/resolution'
+            
+  '/localhost:8323/tnsdb/wildcard_single':
+    get:
+      tags:
+        - REST APIs
+      description: |
+        Request single wildcard search (ex: SEVT/2F13B/+/Cam_tester_2)
+      consumes:
+        - application/json
+      produces:
+        - application/json
+     
+      responses:
+        '200':
+          description: single wildcard get succeeds
+          schema:
+            $ref: '#/definitions/response_of_discoverall'            
+
+  '/localhost:8323/tnsdb/wildcard_multi':
+    get:
+      tags:
+        - REST APIs
+      description: |
+        Request multi wildcard search (ex: SEVT/2F13B/S9/*)
+      consumes:
+        - application/json
+      produces:
+        - application/json
+     
+      responses:
+        '200':
+          description: single wildcard get succeeds
+          schema:
+            $ref: '#/definitions/response_of_discoverall'                  
+            
+definitions:
+
+  tnsdata:
+    required:
+      - topic
+      - endpoint
+      - service_id
+    properties:
+      topic:
+        type: string
+        example: SEVT/2F13B/S9/Cam_tester_25
+      endpoint:
+        type: string
+        example: 10.112.34.114:3434
+      service_id:
+        type: string
+        example: falhkgjasdlkgjspdaijsajaslgalksd
+  resolution:
+    required:
+      - endpoint
+    properties:
+      endpoint:
+        type: string
+        example: 10.112.34.114:3434
+  response_of_discoverall:
+    $ref: '#/definitions/tnsdata'
+
