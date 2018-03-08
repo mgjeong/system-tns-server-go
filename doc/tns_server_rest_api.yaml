@@ -11,7 +11,7 @@ tags:
     description: TNS REST APIs
 
 paths:
-  '/localhost:8323/tnsdb/discoverall':
+  '/api/v1/tns/topic':
     get:
       tags:
         - REST APIs
@@ -26,7 +26,6 @@ paths:
           description: All tns data get succeeds
           schema:
             $ref: '#/definitions/response_of_discoverall'
-  '/localhost:8323/tnsdb/topic_register':
     post:
       tags:
         - REST APIs
@@ -55,7 +54,7 @@ paths:
       responses:
         '200':
           description: Topic register Succeed
-  '/localhost:8323/tnsdb/topic_resolution':
+  '/api/v1/tns/topic/{arg}':
     get:
       tags:
         - REST APIs
@@ -66,9 +65,9 @@ paths:
       produces:
         - application/json
       parameters:
-        - name: topic
+        - name: arg
           in: path
-          description: topic for resolution
+          description: topic for resolution 1. topic name is complete form("SEVT/2F13B/S9/Cam_tester_25")-> it returns endpoint of topic 2. single wildcard("SEVT/2F13B/+/Cam_tester_25")-> it returns all endpoints including '+' wildcard 3. multi wildcard("SEVT/2F13B/S9/*")-> it returns all endpoints including '*' wildcard. more info about topic convention -> http://suprem.sec.samsung.net/confluence/display/ILIOTC/995.+Topic+Naming+Convention+Guide    
           required: true
           type: string
       responses:
@@ -76,40 +75,6 @@ paths:
           description: resolution succeeds
           schema:
             $ref: '#/definitions/resolution'
-            
-  '/localhost:8323/tnsdb/wildcard_single':
-    get:
-      tags:
-        - REST APIs
-      description: |
-        Request single wildcard search (ex: SEVT/2F13B/+/Cam_tester_2)
-      consumes:
-        - application/json
-      produces:
-        - application/json
-     
-      responses:
-        '200':
-          description: single wildcard get succeeds
-          schema:
-            $ref: '#/definitions/response_of_discoverall'            
-
-  '/localhost:8323/tnsdb/wildcard_multi':
-    get:
-      tags:
-        - REST APIs
-      description: |
-        Request multi wildcard search (ex: SEVT/2F13B/S9/*)
-      consumes:
-        - application/json
-      produces:
-        - application/json
-     
-      responses:
-        '200':
-          description: single wildcard get succeeds
-          schema:
-            $ref: '#/definitions/response_of_discoverall'                  
             
 definitions:
 
