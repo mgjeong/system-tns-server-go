@@ -23,8 +23,10 @@ ENV APP_PORT=48323
 ENV APP=tns-server
 
 # install MongoDB
-RUN apk add --no-cache mongodb bash && \
-    rm -rf /var/cache/apk/*
+#RUN apk add --no-cache mongodb bash && \
+#    rm -rf /var/cache/apk/*
+RUN apt-get update
+RUN apt-get install -y mongodb
 
 # copy files
 COPY $APP $APP_DIR/$APP
