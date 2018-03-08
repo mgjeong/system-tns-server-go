@@ -26,7 +26,7 @@ ENV APP=tns-server
 #RUN apk add --no-cache mongodb bash && \
 #    rm -rf /var/cache/apk/*
 #RUN apt-get update
-RUN apt-get install -y mongodb
+#RUN apt-get install -y mongodb
 
 # copy files
 COPY $APP $APP_DIR/$APP
