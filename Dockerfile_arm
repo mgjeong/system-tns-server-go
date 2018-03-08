@@ -19,20 +19,25 @@ FROM armhf/ubuntu:16.10
 
 # environment variables
 ENV APP_DIR=/tns
-ENV APP_PORT=48111
-ENV APP=tns
+ENV APP_PORT=48323
+ENV APP=tns-server
 
-#copy files
-#COPY $APP run.sh $APP_DIR/
-#COPY src/controller/configuration/configuration.json /configuration.json
+# install MongoDB
+RUN apk add --no-cache mongodb bash && \
+    rm -rf /var/cache/apk/*
 
-#expose notifications port
+# copy files
+COPY $APP $APP_DIR/$APP
+COPY run.sh $APP_DIR/run.sh
+COPY config.toml $APP_DIR/config.toml
+
+# expose notifications port
 EXPOSE $APP_PORT
 
-#set the working directory
+# set the working directory
 WORKDIR $APP_DIR
 
-#make mongodb volume
+# make mongodb volume
 RUN mkdir /data && mkdir /data/db
 VOLUME /data/db
 
