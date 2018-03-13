@@ -61,10 +61,8 @@ func CreateTopicList(w http.ResponseWriter, r *http.Request) {
 		respondWithError(w, http.StatusBadRequest, "Invalid request payload")
 		return
 	}
-	// TO DO 
 	// Validation CHECK for duplicate TOPIC
 	if ret := tns.CheckDuplicate(tnsdata); ret != false {
-		//respondWithError(w, http.StatusInternalServerError, err.Error())
 		println("Comeback to Main func with False")
 		return
 	}

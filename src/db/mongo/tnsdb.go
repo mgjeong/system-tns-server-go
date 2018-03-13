@@ -59,15 +59,8 @@ func (m *TNSserver) FindById(id string) (TNSdata, error) {
 	return tns, err
 }
 
-
-///////////////////////////////////////////
-//Check validation for duplicated by topic
-//////////////////////////////////////////
 func (m *TNSserver) CheckDuplicate(tns TNSdata) bool {
-// TODO validation logic implement
-	// if find."topic" is nil
-	// ret = true
-	println("Enter CheckDuplicate")
+	//println("Enter CheckDuplicate")
 	mytopic := tns.Topic
 	println(mytopic)
 	hit, err := db.C(COLLECTION).Find(bson.M{"topic":mytopic}).Count()
@@ -78,17 +71,9 @@ func (m *TNSserver) CheckDuplicate(tns TNSdata) bool {
 		println("There is no duplicated")
 			return false
 	}
-//	if ret := db.C(COLLECTION).Find(bson.M{"topic":mytopic}).Count(); ret != nil {
-//		println("Here is duplicated topic")
-//		return true
-//	}
 	println("There is hit duplicated")
 	return true
 }
-
-//////////////////////////////////////////
-/////////////////////////////////////////
-
 
 // Find a topic list by its topic
 func (m *TNSserver) FindByTopic(topic string) (TNSdata, error) {
