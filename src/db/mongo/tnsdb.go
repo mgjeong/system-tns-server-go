@@ -52,10 +52,34 @@ func (m *TNSserver) FindAll() ([]TNSdata, error) {
 	return tns, err
 }
 
-// Find a topic list by its topic
+// Find a topic list by its id
 func (m *TNSserver) FindById(id string) (TNSdata, error) {
 	var tns TNSdata
 	err := db.C(COLLECTION).FindId(bson.ObjectIdHex(id)).One(&tns)
+	return tns, err
+}
+
+func (m *TNSserver) CheckDuplicate(tns TNSdata) bool {
+	//println("Enter CheckDuplicate")
+	mytopic := tns.Topic
+	println(mytopic)
+	hit, err := db.C(COLLECTION).Find(bson.M{"topic":mytopic}).Count()
+	if err != nil{
+		panic(err)
+	}
+	if hit == 0{
+		println("There is no duplicated")
+			return false
+	}
+	println("There is hit duplicated")
+	return true
+}
+
+// Find a topic list by its topic
+func (m *TNSserver) FindByTopic(topic string) (TNSdata, error) {
+	var tns TNSdata
+	//err := db.C(COLLECTION).FindId(bson.ObjectIdHex(topic)).One(&tns)
+	err := db.C(COLLECTION).Find(bson.ObjectIdHex(topic)).One(&tns)
 	return tns, err
 }
 

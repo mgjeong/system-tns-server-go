@@ -44,7 +44,7 @@ func AllTNSServerList(w http.ResponseWriter, r *http.Request) {
 // GET a list by its topic
 func FindTNSList(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
-	tnsdata, err := tns.FindById(params["id"])
+	tnsdata, err := tns.FindByTopic(params["topic"])
 	if err != nil {
 		respondWithError(w, http.StatusBadRequest, "Invalid topic")
 		return
@@ -61,6 +61,12 @@ func CreateTopicList(w http.ResponseWriter, r *http.Request) {
 		respondWithError(w, http.StatusBadRequest, "Invalid request payload")
 		return
 	}
+	// Validation CHECK for duplicate TOPIC
+	if ret := tns.CheckDuplicate(tnsdata); ret != false {
+		println("Comeback to Main func with False")
+		return
+	}
+	println("Now will be Updated")
 	tnsdata.ID = bson.NewObjectId()
 	if err := tns.Insert(tnsdata); err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
@@ -126,7 +132,7 @@ func main() {
 	r.HandleFunc("/tnsdb", CreateTopicList).Methods("POST")
 	r.HandleFunc("/tnsdb", UpdateTopicList).Methods("PUT")
 	r.HandleFunc("/tnsdb", DeleteTNSList).Methods("DELETE")
-	r.HandleFunc("/tnsdb/{topic}", FindTNSList).Methods("GET")
+	r.HandleFunc("/tnsdb/{id}", FindTNSList).Methods("GET")
 	if err := http.ListenAndServe(":" + config.Port, r); err != nil {
 		log.Fatal(err)
 	}
