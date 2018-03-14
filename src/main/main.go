@@ -42,7 +42,7 @@ func AllTNSServerList(w http.ResponseWriter, r *http.Request) {
 }
 
 // Resolution list of tns topics :: PUT => need to change to GET
-func ResolutionTopic(w http.ResponseWriter, r *http.Request) {
+func ResolutionTopic_PUT(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	var tnsdata TNSdata
 	if err := json.NewDecoder(r.Body).Decode(&tnsdata); err != nil {
@@ -59,12 +59,12 @@ func ResolutionTopic(w http.ResponseWriter, r *http.Request) {
 	respondWithJson(w, http.StatusOK, tnsdata_res)
 }
 
-
-func ResolutionTopic_test(w http.ResponseWriter, r *http.Request) {
+// Resolution list of tns topics by GET/{topic}
+func ResolutionTopic_GET(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	tnsdata_res, err := tns.ResolutionTNS(params["topic"])	
 	if err != nil {
-		respondWithError(w, http.StatusBadRequest, "Invalid id")
+		respondWithError(w, http.StatusBadRequest, "Invalid topic")
 			return
 	}
 	respondWithJson(w, http.StatusOK, tnsdata_res)
@@ -160,10 +160,10 @@ func main() {
 	r.HandleFunc("/tnsdb", AllTNSServerList).Methods("GET")
 	r.HandleFunc("/tnsdb", CreateTopicList).Methods("POST")
 //	r.HandleFunc("/tnsdb", UpdateTopicList).Methods("PUT")
-//	r.HandleFunc("/tnsdb", ResolutionTopic_test).Methods("PUT")
+	r.HandleFunc("/tnsdb", ResolutionTopic_PUT).Methods("PUT")
 	r.HandleFunc("/tnsdb", DeleteTNSList).Methods("DELETE")
 //	r.HandleFunc("/tnsdb/{id}", FindTNSList).Methods("GET")
-	r.HandleFunc("/tnsdb/{topic}", ResolutionTopic_test).Methods("GET")
+	r.HandleFunc("/tnsdb/{topic}", ResolutionTopic_GET).Methods("GET")
 	if err := http.ListenAndServe(":" + config.Port, r); err != nil {
 		log.Fatal(err)
 	}
