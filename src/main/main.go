@@ -41,6 +41,24 @@ func AllTNSServerList(w http.ResponseWriter, r *http.Request) {
 	respondWithJson(w, http.StatusOK, tnsdata)
 }
 
+// Resolution list of tns topics :: PUT
+func ResolutionTopic(w http.ResponseWriter, r *http.Request) {
+	defer r.Body.Close()
+	var tnsdata TNSdata
+	if err := json.NewDecoder(r.Body).Decode(&tnsdata); err != nil {
+		respondWithError(w, http.StatusBadRequest, "Invalid request payload")
+			return
+	}
+	tnsdata.ID = bson.NewObjectId()
+	mytopic := tnsdata.Topic	
+	tnsdata_res, err := tns.ResolutionTNS(mytopic)	
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+			return
+	}
+	respondWithJson(w, http.StatusOK, tnsdata_res)
+}
+
 // GET a list by its topic
 func FindTNSList(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
@@ -130,9 +148,11 @@ func main() {
 	r := mux.NewRouter()
 	r.HandleFunc("/tnsdb", AllTNSServerList).Methods("GET")
 	r.HandleFunc("/tnsdb", CreateTopicList).Methods("POST")
-	r.HandleFunc("/tnsdb", UpdateTopicList).Methods("PUT")
+//	r.HandleFunc("/tnsdb", UpdateTopicList).Methods("PUT")
+	r.HandleFunc("/tnsdb", ResolutionTopic).Methods("PUT")
 	r.HandleFunc("/tnsdb", DeleteTNSList).Methods("DELETE")
 	r.HandleFunc("/tnsdb/{id}", FindTNSList).Methods("GET")
+//	r.HandleFunc("/res", ResolutionTopic).Methods("PUT")
 	if err := http.ListenAndServe(":" + config.Port, r); err != nil {
 		log.Fatal(err)
 	}

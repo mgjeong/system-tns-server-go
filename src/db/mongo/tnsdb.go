@@ -75,6 +75,13 @@ func (m *TNSserver) CheckDuplicate(tns TNSdata) bool {
 	return true
 }
 
+func (m *TNSserver) ResolutionTNS(mytopic string) ([]TNSdata, error) {
+	println("Entered ResoutionTNS")
+	var tns []TNSdata
+	err := db.C(COLLECTION).Find(bson.M{"topic": bson.RegEx{Pattern: mytopic, Options: "i"}}).All(&tns)
+	return tns,err
+}
+
 // Find a topic list by its topic
 func (m *TNSserver) FindByTopic(topic string) (TNSdata, error) {
 	var tns TNSdata
