@@ -157,13 +157,13 @@ func init() {
 // Define HTTP request routes
 func main() {
 	r := mux.NewRouter()
-	r.HandleFunc("/tnsdb", AllTNSServerList).Methods("GET")
-	r.HandleFunc("/tnsdb", CreateTopicList).Methods("POST")
+	r.HandleFunc("/topic", AllTNSServerList).Methods("GET")
+	r.HandleFunc("/topic", CreateTopicList).Methods("POST")
 //	r.HandleFunc("/tnsdb", UpdateTopicList).Methods("PUT")
-	r.HandleFunc("/tnsdb", ResolutionTopic_PUT).Methods("PUT")
-	r.HandleFunc("/tnsdb", DeleteTNSList).Methods("DELETE")
+	r.HandleFunc("/topic", ResolutionTopic_PUT).Methods("PUT")
+	r.HandleFunc("/topic", DeleteTNSList).Methods("DELETE")
 //	r.HandleFunc("/tnsdb/{id}", FindTNSList).Methods("GET")
-	r.HandleFunc("/tnsdb/{topic}", ResolutionTopic_GET).Methods("GET")
+	r.HandleFunc("/topic/{topic}", ResolutionTopic_GET).Methods("GET")
 	if err := http.ListenAndServe(":" + config.Port, r); err != nil {
 		log.Fatal(err)
 	}
