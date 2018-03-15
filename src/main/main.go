@@ -91,8 +91,8 @@ func CreateTopicList(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// Validation CHECK for duplicate TOPIC
-	if ret := tns.CheckDuplicate(tnsdata); ret != false {
-		println("Comeback to Main func with False")
+	if err := tns.CheckDuplicate(tnsdata); err != false {
+		respondWithError(w, http.StatusBadRequest, "Duplicated Topic")
 		return
 	}
 	println("Now will be Updated")
