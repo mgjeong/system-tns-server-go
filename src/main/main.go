@@ -134,6 +134,13 @@ func DeleteTNSList(w http.ResponseWriter, r *http.Request) {
 	respondWithJson(w, http.StatusOK, map[string]string{"result": "success"})
 }
 
+// POST healthcheck for Topics in TNS server
+func TopicHealthcheck(w http.ResponseWriter, r *http.Request) {
+// TODO
+// GET topic and check for existing TNSDB
+// after all check for TNSDB, if there is unchecked topic, than delete it 	
+}
+
 func respondWithError(w http.ResponseWriter, code int, msg string) {
 	respondWithJson(w, code, map[string]string{"error": msg})
 }
@@ -164,6 +171,7 @@ func main() {
 	r.HandleFunc("/topic", DeleteTNSList).Methods("DELETE")
 //	r.HandleFunc("/tnsdb/{id}", FindTNSList).Methods("GET")
 	r.HandleFunc("/topic/{topic}", ResolutionTopic_GET).Methods("GET")
+	r.HandleFunc("/health", TopicHealthcheck).Methods("POST")
 	if err := http.ListenAndServe(":" + config.Port, r); err != nil {
 		log.Fatal(err)
 	}
