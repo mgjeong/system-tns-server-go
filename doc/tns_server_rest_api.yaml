@@ -75,6 +75,25 @@ paths:
           description: resolution succeeds
           schema:
             $ref: '#/definitions/resolution'
+  '/api/v1/tns/health':
+    post:
+      tags:
+        - REST APIs
+      description: |
+        register topic
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: topic
+          in: path
+          description: topic for register
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Health Check Succeed
             
 definitions:
 
