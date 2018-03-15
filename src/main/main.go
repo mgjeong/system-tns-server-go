@@ -51,7 +51,7 @@ func ResolutionTopic_PUT(w http.ResponseWriter, r *http.Request) {
 	}
 	tnsdata.ID = bson.NewObjectId()
 	mytopic := tnsdata.Topic	
-	tnsdata_res, err := tns.ResolutionTNS(mytopic)	
+	tnsdata_res, err := tns.DiscoverTopic(mytopic)	
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 			return
@@ -59,10 +59,10 @@ func ResolutionTopic_PUT(w http.ResponseWriter, r *http.Request) {
 	respondWithJson(w, http.StatusOK, tnsdata_res)
 }
 
-// Resolution list of tns topics by GET/{topic}
-func ResolutionTopic_GET(w http.ResponseWriter, r *http.Request) {
+// Discover topics by keywords  GET/{topic}
+func DiscoverByTopic(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
-	tnsdata_res, err := tns.ResolutionTNS(params["topic"])	
+	tnsdata_res, err := tns.DiscoverTopic(params["topic"])	
 	if err != nil {
 		respondWithError(w, http.StatusBadRequest, "Invalid topic")
 			return
@@ -134,6 +134,13 @@ func DeleteTNSList(w http.ResponseWriter, r *http.Request) {
 	respondWithJson(w, http.StatusOK, map[string]string{"result": "success"})
 }
 
+// POST healthcheck for Topics in TNS server
+func TopicHealthcheck(w http.ResponseWriter, r *http.Request) {
+// TODO
+// GET topic and check for existing TNSDB
+// after all check for TNSDB, if there is unchecked topic, than delete it 	
+}
+
 func respondWithError(w http.ResponseWriter, code int, msg string) {
 	respondWithJson(w, code, map[string]string{"error": msg})
 }
@@ -163,7 +170,9 @@ func main() {
 	r.HandleFunc("/topic", ResolutionTopic_PUT).Methods("PUT")
 	r.HandleFunc("/topic", DeleteTNSList).Methods("DELETE")
 //	r.HandleFunc("/tnsdb/{id}", FindTNSList).Methods("GET")
-	r.HandleFunc("/topic/{topic}", ResolutionTopic_GET).Methods("GET")
+//	r.HandleFunc("/topic/{topic}", ResolutionTopic_GET).Methods("GET")
+	r.HandleFunc("/topic/{topic}", DiscoverByTopic).Methods("GET")
+	r.HandleFunc("/health", TopicHealthcheck).Methods("POST")
 	if err := http.ListenAndServe(":" + config.Port, r); err != nil {
 		log.Fatal(err)
 	}

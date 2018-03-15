@@ -25,5 +25,5 @@ type TNSdata struct {
 	ID          bson.ObjectId `bson:"_id" json:"id"`
 	Topic       string        `bson:"topic" json:"topic"`
 	Endpoint    string        `bson:"endpoint" json:"endpoint"`
-	Service_id  string        `bson:"service_id" json:"service_id"`
+	Schema      string        `bson:"schema" json:"schema"`
 }

@@ -52,7 +52,7 @@ func (m *TNSserver) FindAll() ([]TNSdata, error) {
 	return tns, err
 }
 
-// Find a topic list by its id
+// Find a topic list by its id - NOT USED WILL BE DEPRECATED
 func (m *TNSserver) FindById(id string) (TNSdata, error) {
 	var tns TNSdata
 	err := db.C(COLLECTION).FindId(bson.ObjectIdHex(id)).One(&tns)
@@ -75,7 +75,8 @@ func (m *TNSserver) CheckDuplicate(tns TNSdata) bool {
 	return true
 }
 
-func (m *TNSserver) ResolutionTNS(mytopic string) ([]TNSdata, error) {
+// discover topic with keywords
+func (m *TNSserver) DiscoverTopic(mytopic string) ([]TNSdata, error) {
 	println("Entered ResoutionTNS")
 	var tns []TNSdata
 	err := db.C(COLLECTION).Find(bson.M{"topic": bson.RegEx{Pattern: mytopic, Options: "i"}}).All(&tns)
