@@ -41,12 +41,41 @@ func AllTNSServerList(w http.ResponseWriter, r *http.Request) {
 	respondWithJson(w, http.StatusOK, tnsdata)
 }
 
-// GET a list by its topic
-func FindTNSList(w http.ResponseWriter, r *http.Request) {
+// Resolution list of tns topics :: PUT => need to change to GET
+func ResolutionTopic_PUT(w http.ResponseWriter, r *http.Request) {
+	defer r.Body.Close()
+	var tnsdata TNSdata
+	if err := json.NewDecoder(r.Body).Decode(&tnsdata); err != nil {
+		respondWithError(w, http.StatusBadRequest, "Invalid request payload")
+			return
+	}
+	tnsdata.ID = bson.NewObjectId()
+	mytopic := tnsdata.Topic	
+	tnsdata_res, err := tns.ResolutionTNS(mytopic)	
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, err.Error())
+			return
+	}
+	respondWithJson(w, http.StatusOK, tnsdata_res)
+}
+
+// Resolution list of tns topics by GET/{topic}
+func ResolutionTopic_GET(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
-	tnsdata, err := tns.FindByTopic(params["topic"])
+	tnsdata_res, err := tns.ResolutionTNS(params["topic"])	
 	if err != nil {
 		respondWithError(w, http.StatusBadRequest, "Invalid topic")
+			return
+	}
+	respondWithJson(w, http.StatusOK, tnsdata_res)
+}
+
+// GET a list by its id
+func FindTNSList(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	tnsdata, err := tns.FindById(params["id"])
+	if err != nil {
+		respondWithError(w, http.StatusBadRequest, "Invalid id")
 		return
 	}
 	// TO DO error check for all cases				
@@ -128,11 +157,13 @@ func init() {
 // Define HTTP request routes
 func main() {
 	r := mux.NewRouter()
-	r.HandleFunc("/tnsdb", AllTNSServerList).Methods("GET")
-	r.HandleFunc("/tnsdb", CreateTopicList).Methods("POST")
-	r.HandleFunc("/tnsdb", UpdateTopicList).Methods("PUT")
-	r.HandleFunc("/tnsdb", DeleteTNSList).Methods("DELETE")
-	r.HandleFunc("/tnsdb/{id}", FindTNSList).Methods("GET")
+	r.HandleFunc("/topic", AllTNSServerList).Methods("GET")
+	r.HandleFunc("/topic", CreateTopicList).Methods("POST")
+//	r.HandleFunc("/tnsdb", UpdateTopicList).Methods("PUT")
+	r.HandleFunc("/topic", ResolutionTopic_PUT).Methods("PUT")
+	r.HandleFunc("/topic", DeleteTNSList).Methods("DELETE")
+//	r.HandleFunc("/tnsdb/{id}", FindTNSList).Methods("GET")
+	r.HandleFunc("/topic/{topic}", ResolutionTopic_GET).Methods("GET")
 	if err := http.ListenAndServe(":" + config.Port, r); err != nil {
 		log.Fatal(err)
 	}
