@@ -31,6 +31,7 @@ import (
 var config = Config{}
 var tns = TNSserver{}
 
+// Discover topic
 // GET list of tns topics
 func AllTNSServerList(w http.ResponseWriter, r *http.Request) {
 	  tnsdata, err := tns.FindAll()
@@ -59,7 +60,8 @@ func ResolutionTopic_PUT(w http.ResponseWriter, r *http.Request) {
 	respondWithJson(w, http.StatusOK, tnsdata_res)
 }
 
-// Discover topics by keywords  GET/{topic}
+// Discover topic by keyword
+// GET/{topic}
 func DiscoverByTopic(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	tnsdata_res, err := tns.DiscoverTopic(params["topic"])	
@@ -70,7 +72,8 @@ func DiscoverByTopic(w http.ResponseWriter, r *http.Request) {
 	respondWithJson(w, http.StatusOK, tnsdata_res)
 }
 
-// GET a list by its id
+// Discover topic by id
+// GET/{id}
 func FindTNSList(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	tnsdata, err := tns.FindById(params["id"])
@@ -82,6 +85,7 @@ func FindTNSList(w http.ResponseWriter, r *http.Request) {
 	respondWithJson(w, http.StatusOK, tnsdata)
 }
 
+// Register Topic
 // POST a new list
 func CreateTopicList(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
@@ -119,6 +123,7 @@ func UpdateTopicList(w http.ResponseWriter, r *http.Request) {
 	respondWithJson(w, http.StatusOK, map[string]string{"result": "success"})
 }
 
+// Unregister Topic
 // DELETE an existing lists
 func DeleteTNSList(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
