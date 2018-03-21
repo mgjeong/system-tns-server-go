@@ -169,15 +169,15 @@ func init() {
 // Define HTTP request routes
 func main() {
 	r := mux.NewRouter()
-	r.HandleFunc("/topic", AllTNSServerList).Methods("GET")
-	r.HandleFunc("/topic", CreateTopicList).Methods("POST")
+	r.HandleFunc("/api/v1/tns/topic", AllTNSServerList).Methods("GET")
+	r.HandleFunc("/api/v1/tns/topic", CreateTopicList).Methods("POST")
 //	r.HandleFunc("/tnsdb", UpdateTopicList).Methods("PUT")
-	r.HandleFunc("/topic", ResolutionTopic_PUT).Methods("PUT")
-	r.HandleFunc("/topic", DeleteTNSList).Methods("DELETE")
+	r.HandleFunc("/api/v1/tns/topic", ResolutionTopic_PUT).Methods("PUT")
+	r.HandleFunc("/api/v1/tns/topic", DeleteTNSList).Methods("DELETE")
 //	r.HandleFunc("/tnsdb/{id}", FindTNSList).Methods("GET")
 //	r.HandleFunc("/topic/{topic}", ResolutionTopic_GET).Methods("GET")
-	r.HandleFunc("/topic/{topic}", DiscoverByTopic).Methods("GET")
-	r.HandleFunc("/health", TopicHealthcheck).Methods("POST")
+	r.HandleFunc("/api/v1/tns/topic/{topic}", DiscoverByTopic).Methods("GET")
+	r.HandleFunc("/api/v1/tns/health", TopicHealthcheck).Methods("POST")
 	if err := http.ListenAndServe(":" + config.Port, r); err != nil {
 		log.Fatal(err)
 	}
