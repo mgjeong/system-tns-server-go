@@ -56,6 +56,7 @@ func (m *TNSserver) FindAll() ([]TNSdata, error) {
 func (m *TNSserver) FindById(id string) (TNSdata, error) {
 	var tns TNSdata
 	err := db.C(COLLECTION).FindId(bson.ObjectIdHex(id)).One(&tns)
+	println("Discovery all Respond")
 	return tns, err
 }
 
@@ -77,9 +78,9 @@ func (m *TNSserver) CheckDuplicate(tns TNSdata) bool {
 
 // discover topic with keywords
 func (m *TNSserver) DiscoverTopic(mytopic string) ([]TNSdata, error) {
-	println("Entered ResoutionTNS")
 	var tns []TNSdata
 	err := db.C(COLLECTION).Find(bson.M{"topic": bson.RegEx{Pattern: mytopic, Options: "i"}}).All(&tns)
+	println("Discover with topic name")
 	return tns,err
 }
 
@@ -94,12 +95,14 @@ func (m *TNSserver) FindByTopic(topic string) (TNSdata, error) {
 // Insert a topic list into database
 func (m *TNSserver) Insert(tns TNSdata) error {
 	err := db.C(COLLECTION).Insert(&tns)
+	println("A New Topic Registered")
 	return err
 }
 
 // Delete an existing topic list
 func (m *TNSserver) Delete(tns TNSdata) error {
 	err := db.C(COLLECTION).Remove(&tns)
+	println("A Topic Deleted")
 	return err
 }
 
