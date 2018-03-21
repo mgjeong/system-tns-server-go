@@ -170,7 +170,7 @@ func init() {
 func main() {
 	r := mux.NewRouter()
 	r.HandleFunc("/api/v1/tns/topic", AllTNSServerList).Methods("GET")
-	r.HandleFunc("/api/vi/tns/topic", CreateTopicList).Methods("POST")
+	r.HandleFunc("/api/v1/tns/topic", CreateTopicList).Methods("POST")
 //	r.HandleFunc("/tnsdb", UpdateTopicList).Methods("PUT")
 	r.HandleFunc("/api/v1/tns/topic", ResolutionTopic_PUT).Methods("PUT")
 	r.HandleFunc("/api/v1/tns/topic", DeleteTNSList).Methods("DELETE")
