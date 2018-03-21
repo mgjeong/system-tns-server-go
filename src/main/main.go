@@ -20,6 +20,7 @@ package main
 import (
 	"encoding/json"
 	"log"
+	"fmt"
 	"net/http"
 	"gopkg.in/mgo.v2/bson"
 	"github.com/gorilla/mux"
@@ -32,9 +33,14 @@ var config = Config{}
 var tns = TNSserver{}
 
 // Discover topic
-// GET list of tns topics
+// GET list of tns topics including keyword check
 func AllTNSServerList(w http.ResponseWriter, r *http.Request) {
-	  tnsdata, err := tns.FindAll()
+	queryValues := r.URL.Query()
+	mytopic := queryValues.Get("topic")						 
+	fmt.Printf("query : %v\n",queryValues)							 
+	fmt.Printf("topic : %s\n",mytopic)							 
+	tnsdata, err := tns.DiscoverTopic(mytopic)
+//	tnsdata, err := tns.FindAll()
 		if err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
@@ -96,7 +102,8 @@ func CreateTopicList(w http.ResponseWriter, r *http.Request) {
 	}
 	// Validation CHECK for duplicate TOPIC
 	if err := tns.CheckDuplicate(tnsdata); err != false {
-		respondWithError(w, http.StatusBadRequest, "Duplicated Topic")
+//		respondWithError(w, http.StatusBadRequest, "Duplicated Topic")
+    	respondWithJson(w, http.StatusOK, map[string]string{"result": "duplicated"})
 		return
 	}
 	println("Now will be Updated")
@@ -105,7 +112,8 @@ func CreateTopicList(w http.ResponseWriter, r *http.Request) {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
-	respondWithJson(w, http.StatusCreated, tnsdata)
+	//respondWithJson(w, http.StatusCreated, tnsdata)
+	respondWithJson(w, http.StatusOK, map[string]string{"result": "success"})
 }
 
 // PUT update an existing lists
@@ -171,12 +179,8 @@ func main() {
 	r := mux.NewRouter()
 	r.HandleFunc("/api/v1/tns/topic", AllTNSServerList).Methods("GET")
 	r.HandleFunc("/api/v1/tns/topic", CreateTopicList).Methods("POST")
-//	r.HandleFunc("/tnsdb", UpdateTopicList).Methods("PUT")
-	r.HandleFunc("/api/v1/tns/topic", ResolutionTopic_PUT).Methods("PUT")
 	r.HandleFunc("/api/v1/tns/topic", DeleteTNSList).Methods("DELETE")
-//	r.HandleFunc("/tnsdb/{id}", FindTNSList).Methods("GET")
-//	r.HandleFunc("/topic/{topic}", ResolutionTopic_GET).Methods("GET")
-	r.HandleFunc("/api/v1/tns/topic/{topic}", DiscoverByTopic).Methods("GET")
+	//r.HandleFunc("/api/v1/tns/topic/{topic}", DiscoverByTopic).Methods("GET")
 	r.HandleFunc("/api/v1/tns/health", TopicHealthcheck).Methods("POST")
 	if err := http.ListenAndServe(":" + config.Port, r); err != nil {
 		log.Fatal(err)
