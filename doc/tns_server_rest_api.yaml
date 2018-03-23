@@ -23,7 +23,7 @@ paths:
         - application/json
       responses:
         '200':
-          description: All tns data get succeeds
+          description: TNS system will return topics, you can also query with this GET REST api like this /tns/topic?topic=/test/a then TNS system returns all topics including "/test/a"
           schema:
             $ref: '#/definitions/response_of_discoverall'
     post:
@@ -54,27 +54,7 @@ paths:
       responses:
         '200':
           description: Topic register Succeed
-  '/api/v1/tns/topic/{arg}':
-    get:
-      tags:
-        - REST APIs
-      description: |
-        Topic Resolution 
-      consumes:
-        - application/json
-      produces:
-        - application/json
-      parameters:
-        - name: arg
-          in: path
-          description: topic for resolution 1. topic name is complete form("SEVT/2F13B/S9/Cam_tester_25")-> it returns endpoint of topic 2. single wildcard("SEVT/2F13B/+/Cam_tester_25")-> it returns all endpoints including '+' wildcard 3. multi wildcard("SEVT/2F13B/S9/*")-> it returns all endpoints including '*' wildcard. more info about topic convention -> http://suprem.sec.samsung.net/confluence/display/ILIOTC/995.+Topic+Naming+Convention+Guide    
-          required: true
-          type: string
-      responses:
-        '200':
-          description: resolution succeeds
-          schema:
-            $ref: '#/definitions/resolution'
+
   '/api/v1/tns/health':
     post:
       tags:
@@ -94,7 +74,7 @@ paths:
       responses:
         '200':
           description: Health Check Succeed
-            
+    
 definitions:
 
   tnsdata:
