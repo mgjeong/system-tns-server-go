@@ -23,11 +23,10 @@ import (
 	"fmt"
 	"net/http"
 	"time"
-	"gopkg.in/mgo.v2/bson"
 	"github.com/gorilla/mux"
 	. "config"
-	. "tns_model"
 	. "db/mongo"
+	. "rest"
 )
 
 var config = Config{}
@@ -50,12 +49,10 @@ func HealthCheck(){
 func TriggerHealthCheck(){
 	nextTime := time.Now().Truncate(time.Minute)
   nextTime = nextTime.Add(10*time.Minute)
- // nextTime = nextTime.Add(time.Minute)
 	time.Sleep(time.Until(nextTime))
 	HealthCheck()
 	go TriggerHealthCheck()
 }
-
 
 // POST healthcheck for Topics in TNS server
 func TopicHealthcheck(w http.ResponseWriter, r *http.Request) {
@@ -64,11 +61,21 @@ func TopicHealthcheck(w http.ResponseWriter, r *http.Request) {
 // after all check for TNSDB, if there is unchecked topic, than delete it 	
 }
 
+func respondWithError(w http.ResponseWriter, code int, msg string) {
+	respondWithJson(w, code, map[string]string{"error": msg})
+}
+
+func respondWithJson(w http.ResponseWriter, code int, payload interface{}) {
+	response, _ := json.Marshal(payload)
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(code)
+	w.Write(response)
+}
+
 // Parse the configuration file 'config.toml', and establish a connection to DB
 func init() {
+	println("Entered init")
 	config.Read()
-
-	tns.Connect()
 	tns.Database = config.Database
 	tns.Connect()
 }
@@ -81,7 +88,7 @@ func main() {
 	r.HandleFunc("/api/v1/tns/topic", rest.DeleteTNSList).Methods("DELETE")
 	//r.HandleFunc("/api/v1/tns/topic/{topic}", DiscoverByTopic).Methods("GET")
 //	r.HandleFunc("/api/v1/tns/health", TopicHealthcheck).Methods("POST")
-	TriggerHealthCheck()
+  go TriggerHealthCheck()
 	if err := http.ListenAndServe(":" + config.Port, r); err != nil {
 		log.Fatal(err)
 	}
