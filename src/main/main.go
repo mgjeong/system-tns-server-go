@@ -22,15 +22,41 @@ import (
 	"log"
 	"fmt"
 	"net/http"
+	"time"
 	"gopkg.in/mgo.v2/bson"
 	"github.com/gorilla/mux"
 	. "config"
 	. "tns_model"
 	. "db/mongo"
+	. "rest"
 )
 
 var config = Config{}
 var tns = TNSserver{}
+var rest = RESTServer{}
+
+//HealthCheck function
+func HealthCheck(){
+	r := mux.NewRouter()
+	r.HandleFunc("/api/v1/tns/health", rest.TopicHealthcheck).Methods("POST")
+	// TO DO
+	//1. Get all TNS topic list from DB
+	//2. Edges will ping their service-id 
+	println("start Health Check")
+	fmt.Println(time.Now().Format(time.RFC850))
+}
+
+
+//HealthCheck trigger fuction
+func TriggerHealthCheck(){
+	nextTime := time.Now().Truncate(time.Minute)
+  nextTime = nextTime.Add(10*time.Minute)
+ // nextTime = nextTime.Add(time.Minute)
+	time.Sleep(time.Until(nextTime))
+	HealthCheck()
+	go TriggerHealthCheck()
+}
+
 
 // Discover topic
 // GET list of tns topics including keyword check
@@ -177,11 +203,12 @@ func init() {
 // Define HTTP request routes
 func main() {
 	r := mux.NewRouter()
-	r.HandleFunc("/api/v1/tns/topic", AllTNSServerList).Methods("GET")
-	r.HandleFunc("/api/v1/tns/topic", CreateTopicList).Methods("POST")
-	r.HandleFunc("/api/v1/tns/topic", DeleteTNSList).Methods("DELETE")
+	r.HandleFunc("/api/v1/tns/topic", rest.AllTNSServerList).Methods("GET")
+	r.HandleFunc("/api/v1/tns/topic", rest.CreateTopicList).Methods("POST")
+	r.HandleFunc("/api/v1/tns/topic", rest.DeleteTNSList).Methods("DELETE")
 	//r.HandleFunc("/api/v1/tns/topic/{topic}", DiscoverByTopic).Methods("GET")
-	r.HandleFunc("/api/v1/tns/health", TopicHealthcheck).Methods("POST")
+//	r.HandleFunc("/api/v1/tns/health", TopicHealthcheck).Methods("POST")
+	TriggerHealthCheck()
 	if err := http.ListenAndServe(":" + config.Port, r); err != nil {
 		log.Fatal(err)
 	}
