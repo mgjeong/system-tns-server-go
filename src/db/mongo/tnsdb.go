@@ -43,6 +43,7 @@ func (m *TNSserver) Connect() {
 		log.Fatal(err)
 	}
 	db = session.DB(m.Database)
+	println("DB connected")
 }
 
 // Find topic list of TNS Server
