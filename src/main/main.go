@@ -49,7 +49,7 @@ func main() {
 	r.HandleFunc("/api/v1/tns/topic", rest.DeleteTNSList).Methods("DELETE")
 	//r.HandleFunc("/api/v1/tns/topic/{topic}", DiscoverByTopic).Methods("GET")
 //	r.HandleFunc("/api/v1/tns/health", TopicHealthcheck).Methods("POST")
-  go health.TriggerHealthCheck()
+  go health.TriggerKeepAlive()
 	if err := http.ListenAndServe(":" + config.Port, r); err != nil {
 		log.Fatal(err)
 	}

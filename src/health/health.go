@@ -19,6 +19,7 @@ package health
 
 import (
 	"encoding/json"
+	"log"
 	"fmt"
 	"net/http"
 	"time"
@@ -35,27 +36,55 @@ type HealthServer struct{
 var tns = TNSserver{}
 var rest = RESTServer{}
 var health = HealthServer{}
+var health_server bool = true
+var health_first = false
 
-//HealthCheck function
-func HealthCheck(){
-	r := mux.NewRouter()
-	r.HandleFunc("/api/v1/tns/health", rest.TopicHealthcheck).Methods("POST")
+//Keep-alive init function
+func InitKeepAlive(){
+	if health_server{
+		health_server = false	
+			r := mux.NewRouter()
+			r.HandleFunc("/api/v1/tns/health", rest.TopicHealthcheck).Methods("POST")
+			if err := http.ListenAndServe(":48324", r); err != nil {
+				log.Fatal(err)
+			}
+	}
 	// TO DO
 	//1. Get all TNS topic list from DB
+  GetTopicData()
+
 	//2. Edges will ping their service-id 
 	println("start Health Check")
 	fmt.Println(time.Now().Format(time.RFC850))
 }
 
+//Close Keep-alive session
+func CloseKeepAlive(){
+// TO DO
+	//1. sort  unpinged topics(by cid)
+	//2. query to DB to DELETE unpinged topics(by cid)
+}
 
 //HealthCheck trigger fuction
-func (m *HealthServer) TriggerHealthCheck(){
+func (m *HealthServer) TriggerKeepAlive(){
 	nextTime := time.Now().Truncate(time.Minute)
-  nextTime = nextTime.Add(10*time.Minute)
+  nextTime = nextTime.Add(time.Minute)
+	if health_first{
+	go InitKeepAlive()
+	}
 	time.Sleep(time.Until(nextTime))
-	HealthCheck()
-	go health.TriggerHealthCheck()
+	health_first = true	
+	println("End Health Check")
+	fmt.Println(time.Now().Format(time.RFC850))
+	go health.TriggerKeepAlive()
 }
+
+// Get All Topic List for keep-alive
+func GetTopicData(){
+// TO DO
+
+}
+
 
 // POST healthcheck for Topics in TNS server
 func TopicHealthcheck(w http.ResponseWriter, r *http.Request) {
