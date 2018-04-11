@@ -151,10 +151,12 @@ func (m *RESTServer) DeleteTNSList(w http.ResponseWriter, r *http.Request) {
 }
 
 // POST healthcheck for Topics in TNS server
-func (m *RESTServer) TopicHealthcheck(w http.ResponseWriter, r *http.Request) {
+func (m *RESTServer) TopicKeepAlive(w http.ResponseWriter, r *http.Request) {
 // TODO
 // GET topic and check for existing TNSDB
 // after all check for TNSDB, if there is unchecked topic, than delete it 	
+  println("HealthCheck POST test done")
+	respondWithJson(w, http.StatusOK, map[string]string{"result": "health check test success"})
 }
 
 func respondWithError(w http.ResponseWriter, code int, msg string) {
