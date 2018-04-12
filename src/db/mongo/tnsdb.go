@@ -20,6 +20,7 @@ package tns
 import (
 	"log"
 
+	"fmt"
 	. "tns_model"
 	mgo "gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
@@ -85,6 +86,15 @@ func (m *TNSserver) DiscoverTopic(mytopic string) ([]TNSdata, error) {
 	return tns,err
 }
 
+// discover topic for Delete
+func (m *TNSserver) DiscoverDELTopic(mytopic string) (TNSdata, error) {
+	println("Enter DiscoverDELTopic")
+	var tns TNSdata
+	err := db.C(COLLECTION).Find(bson.M{"topic": bson.RegEx{Pattern: mytopic, Options: "i"}}).One(&tns)
+	println("Discover with topic name")
+	return tns,err
+}
+
 // Find a topic list by its topic
 func (m *TNSserver) FindByTopic(topic string) (TNSdata, error) {
 	var tns TNSdata
@@ -102,6 +112,15 @@ func (m *TNSserver) Insert(tns TNSdata) error {
 
 // Delete an existing topic list
 func (m *TNSserver) Delete(tns TNSdata) error {
+	println("Enter Delete of tns")	
+	myID := tns.ID
+	mytopic := tns.Topic
+	myEndpoint := tns.Endpoint
+	mySchema := tns.Schema
+	fmt.Printf("DELETE id : %s\n",myID)							 
+	fmt.Printf("DELETE topic : %s\n",mytopic)							 
+	fmt.Printf("DELETE Endpoint : %s\n",myEndpoint)							 
+	fmt.Printf("DELETE schema : %s\n",mySchema)							 
 	err := db.C(COLLECTION).Remove(&tns)
 	println("A Topic Deleted")
 	return err

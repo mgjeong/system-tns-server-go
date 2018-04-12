@@ -33,6 +33,7 @@ type RESTServer struct{
 }
 
 var tns = TNSserver{}
+var rest = RESTServer{}
 
 // Discover topic
 // GET list of tns topics including keyword check
@@ -134,6 +135,7 @@ func (m *RESTServer) UpdateTopicList(w http.ResponseWriter, r *http.Request) {
 	respondWithJson(w, http.StatusOK, map[string]string{"result": "success"})
 }
 
+
 // Unregister Topic
 // DELETE an existing lists
 func (m *RESTServer) DeleteTNSList(w http.ResponseWriter, r *http.Request) {
@@ -141,14 +143,26 @@ func (m *RESTServer) DeleteTNSList(w http.ResponseWriter, r *http.Request) {
 	var tnsdata TNSdata
 	if err := json.NewDecoder(r.Body).Decode(&tnsdata); err != nil {
 		respondWithError(w, http.StatusBadRequest, "Invalid request payload")
-		return
+			return
 	}
-	if err := tns.Delete(tnsdata); err != nil {
+	mytopic := tnsdata.Topic	
+	fmt.Printf("REST DELETE topic : %s\n",mytopic)							 
+	tnsdata, err := tns.DiscoverDELTopic(mytopic)
+	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
-	respondWithJson(w, http.StatusOK, map[string]string{"result": "success"})
+	rest.Deletetopic(tnsdata)
 }
+
+
+// Unregister Topic
+// DELETE an existing lists
+func (m *RESTServer) Deletetopic(tnsdata TNSdata) {
+	println("Enter Deletetopic")
+	tns.Delete(tnsdata)
+}
+
 
 // POST healthcheck for Topics in TNS server
 func (m *RESTServer) TopicKeepAlive(w http.ResponseWriter, r *http.Request) {
