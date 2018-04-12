@@ -152,15 +152,18 @@ func (m *RESTServer) DeleteTNSList(w http.ResponseWriter, r *http.Request) {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
-	rest.Deletetopic(tnsdata)
+	if err := rest.Deletetopic(tnsdata); err != nil {
+		respondWithError(w, http.StatusBadRequest, "Delete failed")
+	}
+	respondWithJson(w, http.StatusOK, map[string]string{"result": "success"})
 }
-
 
 // Unregister Topic
 // DELETE an existing lists
-func (m *RESTServer) Deletetopic(tnsdata TNSdata) {
+func (m *RESTServer) Deletetopic(tnsdata TNSdata) error{
 	println("Enter Deletetopic")
-	tns.Delete(tnsdata)
+	err := tns.Delete(tnsdata)
+	return err
 }
 
 
