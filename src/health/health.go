@@ -44,7 +44,7 @@ func InitKeepAlive(){
 	if health_server{
 		health_server = false	
 			r := mux.NewRouter()
-			r.HandleFunc("/api/v1/tns/health", rest.TopicKeepAlive).Methods("POST")
+			r.HandleFunc("/api/v1/tns/keepalive", rest.TopicKeepAlive).Methods("POST")
 			if err := http.ListenAndServe(":48324", r); err != nil {
 				log.Fatal(err)
 			}
