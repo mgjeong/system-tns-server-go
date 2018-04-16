@@ -173,7 +173,8 @@ func (m *RESTServer) TopicKeepAlive(w http.ResponseWriter, r *http.Request) {
 // GET topic and check for existing TNSDB
 // after all check for TNSDB, if there is unchecked topic, than delete it 	
   println("HealthCheck POST test done")
-	respondWithJson(w, http.StatusOK, map[string]string{"result": "health check test success"})
+//	respondWithJson(w, http.StatusOK, map[string]string{"result": "health check test success"})
+	respondWithJson(w, http.StatusOK, map[string]string{"result": "success"})
 }
 
 func respondWithError(w http.ResponseWriter, code int, msg string) {
