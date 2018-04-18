@@ -91,7 +91,7 @@ func (m *HealthServer) TopicKeepAlive(w http.ResponseWriter, r *http.Request) {
 	health.CheckKeepAlive(kadata[idx].Topic)
 	}
 	println("Keep Alive POST test done")
-	respondWithJson(w, http.StatusOK, map[string]string{"result": "keep alive test success"})
+	respondWithJson(w, http.StatusOK, map[string]string{"result": "success"})
 }
 
 //Check KeepAlive from List
