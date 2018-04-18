@@ -55,9 +55,8 @@ func InitKeepAlive(){
 				log.Fatal(err)
 			}
 	}
-	// TO DO
 	//1. Get all TNS topic list from DB
-for i:= 0;i<1000;i++{
+  for i:= 0;i<1000;i++{
 	keepAliveList[i].Topic = ""
 	keepAliveList[i].Status = false
 }
@@ -73,17 +72,13 @@ for i:= 0;i<1000;i++{
 // POST healthcheck for Topics in TNS server
 func (m *HealthServer) TopicKeepAlive(w http.ResponseWriter, r *http.Request) {
 	println("Entered TopicKeepAlive")
-//	b, err := ioutil.ReadAll(r.Body)
 	defer r.Body.Close()
 	var kadata []POST_ka
-//	if err := json.NewDecoder(r.Body).Decode(&kadata); err != nil {
   body, err1 := ioutil.ReadAll(r.Body);
 	if err1 != nil {
 	}
 	fmt.Printf("Body string : %s\n",body)							 
 	json.Unmarshal(body, &kadata)
-	//	respondWithError(w, http.StatusBadRequest, "Invalid request payload")
-	//	return
   var i = 0
 	var size = len(kadata)
 	fmt.Printf("kadata size : %d\n", size)
@@ -101,7 +96,6 @@ func (m *HealthServer) TopicKeepAlive(w http.ResponseWriter, r *http.Request) {
 
 //Check KeepAlive from List
 func (m *HealthServer) CheckKeepAlive(topic string) {
-//TO DO check keepalive List
 	var idx = 0
 	for idx = 0; idx < list_size; idx++ {
   if strings.EqualFold(topic,keepAliveList[idx].Topic) == true {
@@ -115,9 +109,6 @@ func (m *HealthServer) CheckKeepAlive(topic string) {
 
 //Close Keep-alive session
 func (m *HealthServer) CloseKeepAlive() {
-// TO DO
-	//1. sort  unpinged topics(by cid)
-	//2. query to DB to DELETE unpinged topics(by cid)
 	var idx = 0
 	for idx = 0; idx < list_size; idx++ {
   if keepAliveList[idx].Status == false {
@@ -126,11 +117,9 @@ func (m *HealthServer) CloseKeepAlive() {
 		fmt.Printf("REST DELETE topic : %s\n",mytopic)							 
 		tnsdata, err := tns.DiscoverDELTopic(mytopic)
 		if err != nil {
-		//	respondWithError(w, http.StatusInternalServerError, err.Error())
 				return
 		}
 		if err1 := tns.Delete(tnsdata); err1 != nil {
-		//	respondWithError(w, http.StatusBadRequest, "Delete failed")
 		}
 	time.Sleep(10*time.Millisecond)
 	}
