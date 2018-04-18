@@ -107,7 +107,7 @@ func (m *HealthServer) CheckKeepAlive(topic string) {
   if strings.EqualFold(topic,keepAliveList[idx].Topic) == true {
 	  fmt.Printf("keepalive for loop idx : %d\n", idx)
 		keepAliveList[idx].Status = true
-	  fmt.Printf("keepalive erase topic : %d  %d \n", idx, keepAliveList[idx].Status)
+	  fmt.Printf("keepalive selected topic : %d  %d \n", idx, keepAliveList[idx].Status)
 		break	
 	}
 	}
