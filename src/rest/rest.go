@@ -34,6 +34,7 @@ type RESTServer struct{
 
 var tns = TNSserver{}
 var rest = RESTServer{}
+//var health = HealthServer{}
 
 // Discover topic
 // GET list of tns topics including keyword check
@@ -168,14 +169,24 @@ func (m *RESTServer) Deletetopic(tnsdata TNSdata) error{
 
 
 // POST healthcheck for Topics in TNS server
-func (m *RESTServer) TopicKeepAlive(w http.ResponseWriter, r *http.Request) {
+//func (m *RESTServer) TopicKeepAlive(w http.ResponseWriter, r *http.Request) {
 // TODO
 // GET topic and check for existing TNSDB
 // after all check for TNSDB, if there is unchecked topic, than delete it 	
-  println("HealthCheck POST test done")
+//  
+//	defer r.Body.Close()
+//	var tnsdata []TNSdata
+//	if err := json.NewDecoder(r.Body).Decode(&tnsdata); err != nil {
+//		respondWithError(w, http.StatusBadRequest, "Invalid request payload")
+//		return
+//	}
+// var idx = 0
+//for idx = 0; idx < len(tnsdata); idx++ {
+//	tns.CheckKeepAlive_rest(tnsdata[idx].Topic)
+//	}
+//	println("HealthCheck POST test done")
 //	respondWithJson(w, http.StatusOK, map[string]string{"result": "health check test success"})
-	respondWithJson(w, http.StatusOK, map[string]string{"result": "success"})
-}
+//}
 
 func respondWithError(w http.ResponseWriter, code int, msg string) {
 	respondWithJson(w, code, map[string]string{"error": msg})
