@@ -16,7 +16,7 @@ paths:
       tags:
         - REST APIs
       description: |
-        Request get all lists of tnsdb
+        Request get all lists of tnsdb port:48323
       consumes:
         - application/json
       produces:
@@ -38,7 +38,7 @@ paths:
       parameters:
         - name: topic
           in: path
-          description: topic for register
+          description: topic for register port:48323
           required: true
           type: string
         - name: endpoint
@@ -55,12 +55,12 @@ paths:
         '200':
           description: Topic register Succeed
 
-  '/api/v1/tns/health':
+  '/api/v1/tns/keepalive':
     post:
       tags:
         - REST APIs
       description: |
-        register topic
+        send keep alive topics in Json format port:48324
       consumes:
         - application/json
       produces:
@@ -73,7 +73,7 @@ paths:
           type: string
       responses:
         '200':
-          description: Health Check Succeed
+          description: Success
     
 definitions:
 

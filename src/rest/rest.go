@@ -106,7 +106,6 @@ func (m *RESTServer) CreateTopicList(w http.ResponseWriter, r *http.Request) {
 	}
 	// Validation CHECK for duplicate TOPIC
 	if err := tns.CheckDuplicate(tnsdata); err != false {
-//		respondWithError(w, http.StatusBadRequest, "Duplicated Topic")
     	respondWithJson(w, http.StatusOK, map[string]string{"result": "duplicated"})
 		return
 	}
@@ -116,7 +115,6 @@ func (m *RESTServer) CreateTopicList(w http.ResponseWriter, r *http.Request) {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
-	//respondWithJson(w, http.StatusCreated, tnsdata)
 	respondWithJson(w, http.StatusOK, map[string]string{"result": "success"})
 }
 
@@ -164,17 +162,6 @@ func (m *RESTServer) Deletetopic(tnsdata TNSdata) error{
 	println("Enter Deletetopic")
 	err := tns.Delete(tnsdata)
 	return err
-}
-
-
-// POST healthcheck for Topics in TNS server
-func (m *RESTServer) TopicKeepAlive(w http.ResponseWriter, r *http.Request) {
-// TODO
-// GET topic and check for existing TNSDB
-// after all check for TNSDB, if there is unchecked topic, than delete it 	
-  println("HealthCheck POST test done")
-//	respondWithJson(w, http.StatusOK, map[string]string{"result": "health check test success"})
-	respondWithJson(w, http.StatusOK, map[string]string{"result": "success"})
 }
 
 func respondWithError(w http.ResponseWriter, code int, msg string) {
