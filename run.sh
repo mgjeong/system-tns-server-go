@@ -16,5 +16,4 @@
 ###############################################################################
 #!/bin/bash
 mongod --repair
-mongod --smallfiles &
-/tns/tns-server
+mongod --smallfiles & ./tns-server
