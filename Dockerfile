@@ -14,32 +14,28 @@
 # limitations under the License.
 #
 ###############################################################################
-# Docker image for "Topic Naming Space"
+# Docker image for "tns-server"
 FROM alpine:3.6
 
 # environment variables
 ENV APP_DIR=/tns
-ENV APP_PORT=48323
 ENV APP=tns-server
 
 # install MongoDB
 RUN apk add --no-cache mongodb bash && \
     rm -rf /var/cache/apk/*
 
-# copy files
-COPY $APP $APP_DIR/$APP
-COPY run.sh $APP_DIR/run.sh
-COPY config.toml $APP_DIR/config.toml
-
-# expose notifications port
-EXPOSE $APP_PORT
-
-# set the working directory
-WORKDIR $APP_DIR
-
 # make mongodb volume
 RUN mkdir /data && mkdir /data/db
 VOLUME /data/db
 
-#kick off the tns container
+# copy files
+COPY $APP $APP_DIR/$APP
+COPY run.sh $APP_DIR/run.sh
+COPY ./config $APP_DIR/config
+
+# set the working directory
+WORKDIR $APP_DIR
+
+# kick off the tns-server container
 CMD ["sh", "run.sh"]

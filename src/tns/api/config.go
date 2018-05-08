@@ -15,10 +15,41 @@
  *
  *******************************************************************************/
 
-package postka_model
+package api
 
-// Represents a TNS data, we uses bson keyword to tell the mgo driver how to name
-// the properties in mongodb document
-type POST_ka struct {
-	Topic       string        `bson:"topic" json:"topic"`
+import (
+	"github.com/BurntSushi/toml"
+	"os"
+	"tns/commons/logger"
+)
+
+type Config struct {
+	Server struct {
+		Ip                string
+		Port              uint
+		KeepAliveInterval uint
+	}
+	Database struct {
+		Ip         string
+		Port       uint
+		Name       string
+		Collection string
+	}
+}
+
+// Read and parse the configuration file
+func (c *Config) Read(filePath string) error {
+	logger.Logging(logger.DEBUG, "File path: "+filePath)
+
+	if _, err := os.Stat(filePath); err != nil {
+		logger.Logging(logger.ERROR, "Cannot Open the file: ", err.Error())
+		return err
+	}
+
+	if _, err := toml.DecodeFile(filePath, &c); err != nil {
+		logger.Logging(logger.ERROR, "DecodeFile failed: "+err.Error())
+		return err
+	}
+
+	return nil
 }

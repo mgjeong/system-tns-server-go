@@ -16,18 +16,17 @@
 ###############################################################################
 #!/bin/bash
 
-echo -e "\n\033[33m"Start building of Topic Naming Space"\033[0m"
+echo -e "\n\033[33m"Start building of Topic Name Service"\033[0m"
 export GOPATH=$PWD
 
 function func_cleanup(){
     rm -rf $GOPATH/pkg
-    rm -rf $GOPATH/src/docker.io
-    rm -rf $GOPATH/src/golang.org
-    rm -rf $GOPATH/src/github.com
+    #rm -rf $GOPATH/src/golang.org
+    #rm -rf $GOPATH/src/github.com
 }
 
 function build(){
-    CGO_ENABLED=0 GOOS=linux go build -o tns-server -a -ldflags '-extldflags "-static"'  src/main/main.go
+    CGO_ENABLED=0 GOOS=linux go build -o tns-server -a -ldflags '-extldflags "-static"' src/main/main.go
     if [ $? -ne 0 ]; then
         echo -e "\n\033[31m"build fail"\033[0m"
         func_cleanup
@@ -37,10 +36,9 @@ function build(){
 
 function download_pkgs(){
     pkg_list=(
-    "github.com/BurntSushi/toml"
-    "gopkg.in/mgo.v2"
-    "github.com/gorilla/mux"
-		)
+        "github.com/BurntSushi/toml"
+        "gopkg.in/mgo.v2"
+    )
 
     idx=1
     for pkg in "${pkg_list[@]}"; do
@@ -54,18 +52,17 @@ function download_pkgs(){
         echo ": Done"
         idx=$((idx+1))
     done
-    rm -rf $GOPATH/src/github.com/docker/distribution/vendor/github.com/opencontainers
 }
 
 echo -e "\nDownload dependent go-pkgs"
 download_pkgs
 
-echo -ne "\nMaking executable file of Topic Naming Space"
+echo -ne "\nMaking executable file of Topic Name Service"
 build
 echo ": Done"
 
-echo -ne "\nPost processing"
-func_cleanup
-echo ": Done"
+# echo -ne "\nPost processing"
+# func_cleanup
+# echo ": Done"
 
-echo -e "\n\033[33m"Succeed build of Topic Naming Space"\033[0m"
+echo -e "\n\033[33m"Succeed build of Topic Name Service"\033[0m"
