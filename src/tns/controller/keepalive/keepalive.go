@@ -44,6 +44,8 @@ type keepAliveInfo struct {
 	interval uint
 }
 
+const kaPingFrequency = 3
+
 var topicDbExecutor topicDB.Command
 var kaInfo keepAliveInfo
 
@@ -143,7 +145,7 @@ func (Executor) HandlePing(body string) (map[string]interface{}, error) {
 }
 
 func (Executor) GetInterval() uint {
-	return kaInfo.interval
+	return kaInfo.interval / kaPingFrequency
 }
 
 func keepAliveTimerLoop(interval uint) {
