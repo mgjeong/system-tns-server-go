@@ -27,7 +27,6 @@ import (
 
 const (
 	WILDCARD      = "*"
-	REG_EX_OPTION = "i" // option for case-insensitive
 )
 
 type Command interface {
@@ -117,7 +116,7 @@ func (m Executor) CreateTopic(properties map[string]interface{}) error {
 
 func (m Executor) DeleteTopic(name string) error {
 	pattern := "^" + name + "$"
-	query := bson.M{"name": bson.RegEx{Pattern: pattern, Options: REG_EX_OPTION}}
+	query := bson.M{"name": bson.RegEx{Pattern: pattern}}
 
 	err := mgoTopicCollection.Remove(query)
 	if err != nil {
@@ -172,7 +171,7 @@ func (m Executor) ReadTopic(name string, hierarchical bool) ([]map[string]interf
 }
 
 func (m Executor) readTopicFromDB(pattern string) ([]map[string]interface{}, error) {
-	query := bson.M{"name": bson.RegEx{Pattern: pattern, Options: REG_EX_OPTION}}
+	query := bson.M{"name": bson.RegEx{Pattern: pattern}}
 	topics := []Topic{}
 
 	err := mgoTopicCollection.Find(query).All(&topics)
@@ -199,7 +198,7 @@ func (m Executor) readTopicWildcard(name string) ([]map[string]interface{}, erro
 
 func (m Executor) isTopicNameExists(name string) (bool, error) {
 	pattern := "^" + name + "$"
-	query := bson.M{"name": bson.RegEx{Pattern: pattern, Options: REG_EX_OPTION}}
+	query := bson.M{"name": bson.RegEx{Pattern: pattern}}
 
 	hit, err := mgoTopicCollection.Find(query).Count()
 	if err != nil {
