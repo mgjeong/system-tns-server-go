@@ -65,9 +65,11 @@ func (Executor) InitKeepAlive(interval uint) error {
 	}
 
 	// Init Keepalive Table
+	logger.Logging(logger.DEBUG, "Initialize Keep-alive Table")
 	kaInfo.table = make(kaTableType)
 	currTime := time.Now()
 	for _, topic := range topics {
+		logger.Logging(logger.DEBUG, topic["name"].(string))
 		kaInfo.table[topic["name"].(string)] = currTime
 	}
 

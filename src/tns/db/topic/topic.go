@@ -67,6 +67,9 @@ func (m Executor) Connect(url string, name string, collection string) error {
 
 	mgoSession = session
 	mgoTopicCollection = session.DB(name).C(collection)
+
+	logger.Logging(logger.DEBUG, "DB connected: "+url)
+
 	return nil
 }
 
