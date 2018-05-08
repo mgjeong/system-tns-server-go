@@ -1,9 +1,13 @@
+## tns-server docker compose file
+
 version: '2'
 services:
-    tns:
-        image: docker.sec.samsung.net:5000/edge/system-tns-server-go/ubuntu_x86_64
-        ports:
-            - "48323:48323"
-        container_name: tns-server
+  tns:
+    image: docker.sec.samsung.net:5000/edge/system-tns-server-go/ubuntu_x86_64
+    ports:
+      - "48323:48323"
+    volumes:
+      - /data/db
+    container_name: tns-server
 ...
 
