@@ -20,19 +20,22 @@ FROM alpine:3.6
 # environment variables
 ENV APP_DIR=/tns
 ENV APP=tns-server
+ENV APP_PORT=48323
 
 # install MongoDB
 RUN apk add --no-cache mongodb bash && \
     rm -rf /var/cache/apk/*
 
 # make mongodb volume
-RUN mkdir /data && mkdir /data/db
+RUN mkdir -p /data/db
 VOLUME /data/db
 
 # copy files
-COPY $APP $APP_DIR/$APP
-COPY run.sh $APP_DIR/run.sh
+COPY $APP run.sh $APP_DIR/
 COPY ./config $APP_DIR/config
+
+# expose tns-server rest api port
+EXPOSE $APP_PORT
 
 # set the working directory
 WORKDIR $APP_DIR

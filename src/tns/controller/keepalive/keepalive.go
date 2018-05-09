@@ -44,6 +44,8 @@ type keepAliveInfo struct {
 	interval uint
 }
 
+const kaPingFrequency = 3
+
 var topicDbExecutor topicDB.Command
 var kaInfo keepAliveInfo
 
@@ -63,9 +65,11 @@ func (Executor) InitKeepAlive(interval uint) error {
 	}
 
 	// Init Keepalive Table
+	logger.Logging(logger.DEBUG, "Initialize Keep-alive Table")
 	kaInfo.table = make(kaTableType)
 	currTime := time.Now()
 	for _, topic := range topics {
+		logger.Logging(logger.DEBUG, topic["name"].(string))
 		kaInfo.table[topic["name"].(string)] = currTime
 	}
 
@@ -143,7 +147,7 @@ func (Executor) HandlePing(body string) (map[string]interface{}, error) {
 }
 
 func (Executor) GetInterval() uint {
-	return kaInfo.interval
+	return kaInfo.interval / kaPingFrequency
 }
 
 func keepAliveTimerLoop(interval uint) {
@@ -153,7 +157,7 @@ func keepAliveTimerLoop(interval uint) {
 	timeDurationSec := time.Duration(interval) * time.Second
 	ticker := time.NewTicker(timeDurationSec)
 
-	for _ = range ticker.C {
+	for range ticker.C {
 		kaInfo.Lock()
 		for topic, timestamp := range kaInfo.table {
 			// Remove expired topics

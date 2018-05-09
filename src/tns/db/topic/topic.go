@@ -26,11 +26,13 @@ import (
 )
 
 const (
-	WILDCARD      = "*"
+	WILDCARD         = "*"
+	DB_URL           = "127.0.0.1:27017"
+	TOPIC_COLLECTION = "TOPIC"
 )
 
 type Command interface {
-	Connect(url string, name string, collection string) error
+	Connect(name string) error
 	Close()
 	CreateTopic(map[string]interface{}) error
 	ReadTopicAll() ([]map[string]interface{}, error)
@@ -47,8 +49,10 @@ type Topic struct {
 	Datamodel string `bson:"datamodel"`
 }
 
-var mgoSession *mgo.Session
-var mgoTopicCollection *mgo.Collection
+var (
+	mgoSession         *mgo.Session
+	mgoTopicCollection *mgo.Collection
+)
 
 func (topic Topic) convertToMap() map[string]interface{} {
 	return map[string]interface{}{
@@ -58,15 +62,18 @@ func (topic Topic) convertToMap() map[string]interface{} {
 	}
 }
 
-func (m Executor) Connect(url string, name string, collection string) error {
-	session, err := mgo.Dial(url)
+func (m Executor) Connect(name string) error {
+	session, err := mgo.Dial(DB_URL)
 	if err != nil {
 		logger.Logging(logger.ERROR, err.Error())
 		return err
 	}
 
 	mgoSession = session
-	mgoTopicCollection = session.DB(name).C(collection)
+	mgoTopicCollection = mgoSession.DB(name).C(TOPIC_COLLECTION)
+
+	logger.Logging(logger.DEBUG, "DB connected: "+DB_URL)
+
 	return nil
 }
 
@@ -162,9 +169,6 @@ func (m Executor) ReadTopic(name string, hierarchical bool) ([]map[string]interf
 	if err != nil {
 		logger.Logging(logger.ERROR, "readTopicFromDB failed")
 		return nil, err
-	} else if len(topics) == 0 {
-		logger.Logging(logger.DEBUG, "Nothing found")
-		return nil, errors.NotFound{name}
 	}
 
 	return topics, nil

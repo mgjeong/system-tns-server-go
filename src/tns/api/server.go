@@ -56,8 +56,7 @@ func RunServer(filePath string) {
 		return
 	}
 
-	dbUrl := config.Database.Ip + ":" + fmt.Sprint(config.Database.Port)
-	err = topicDbExecutor.Connect(dbUrl, config.Database.Name, config.Database.Collection)
+	err = topicDbExecutor.Connect(config.Database.Name)
 	if err != nil {
 		logger.Logging(logger.ERROR, "Failed to connect to DB")
 		return
