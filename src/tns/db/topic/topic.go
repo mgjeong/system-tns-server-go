@@ -169,9 +169,6 @@ func (m Executor) ReadTopic(name string, hierarchical bool) ([]map[string]interf
 	if err != nil {
 		logger.Logging(logger.ERROR, "readTopicFromDB failed")
 		return nil, err
-	} else if len(topics) == 0 {
-		logger.Logging(logger.DEBUG, "Nothing found")
-		return nil, errors.NotFound{name}
 	}
 
 	return topics, nil

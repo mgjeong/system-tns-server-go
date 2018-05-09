@@ -93,6 +93,12 @@ func (Executor) ReadTopic(name string, hierarchical bool) (map[string]interface{
 
 	if err != nil {
 		return nil, err
+	} else if len(topics) == 0 {
+		logger.Logging(logger.DEBUG, "Nothing found")
+		if name == "" {
+			name = "topic is empty"
+		}
+		return nil, errors.NotFound{name}
 	}
 
 	resp := make(map[string]interface{})
