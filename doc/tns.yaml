@@ -1,0 +1,154 @@
+swagger: '2.0'
+info:
+  title: TNS REST APIs
+  description: Topic Name Service(TNS)
+  version: v1-20180509
+schemes:
+  - http
+tags:
+  - name: TNS REST APIs
+    description: Topic Name Service(TNS)
+paths:
+  /api/v1/tns/topic:
+    get:
+      tags:
+        - Discovery
+      description: >
+        This API can be used for request of topic data registered by the data
+        publisher. Basically all of the topic data stored in TNS server are
+        transfered as a response. Here the topic data includes name of topic,
+        endpoint address such as IP and Port and data model ID. Additionally,
+        the API supports name matching or hierarchical topic discovery by using
+        query statement. For example, you can retrive a name maching topic data
+        like "/api/v1/tns?name=/a/b. In this case, only the topic data having
+        /a/b as the name is returned. As for hierarchical topic discovery, you
+        can look it up like "/api/v1/tns?name=/a/b&hierarchical=yes". Then all
+        the multiple topic data having /a/b/ in the top fields can be returned. 
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: >-
+            SUCCESS | TNS server responses a result code with topic data as
+            following example.
+          schema:
+            $ref: '#/definitions/discovery'
+        '404':
+          description: NOT FOUND (eg. topic not found)
+        '500':
+          description: INTERNAL SERVER ERROR (eg. DB operation failed)
+    post:
+      tags:
+        - Registration
+      description: >
+        Topic information including the name of topic, publisher endpoint
+        address and data model ID is registered and stored in TNS server. As the
+        result, Keep Alive(KA) interval time (second) is responsed to the client
+        if registered successfully.
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: name
+          in: path
+          description: name of topic
+          required: true
+          type: string
+        - name: endpoint
+          in: path
+          description: 'endpoint address(ip,port) of publisher'
+          required: true
+          type: string
+        - name: datamodel
+          in: path
+          description: ID of AutomationML data model
+          required: true
+          type: string
+      responses:
+        '201':
+          description: CREATED
+          schema:
+            $ref: '#/definitions/keepalive_interval'
+        '400':
+          description: BAD REQUEST (eg. invalid json)
+        '409':
+          description: CONFLICT (eg. already exists)
+        '500':
+          description: INTERNAL SERVER ERROR (eg. DB operation failed)
+    delete:
+      tags:
+        - Unregistration
+      description: >
+        Topic data registred in TNS server is deleted by this reqeust. The
+        deliting topic is indicated by using query like
+        "/api/v1/tns/topic?name=/a/b/c". Note that hierarchy or wildcard option
+        is not supported for this API.
+      responses:
+        '200':
+          description: SUCCESS
+        '400':
+          description: BAD REQUEST (eg. request with hierarchical or wildcard option)
+        '404':
+          description: NOT FOUND
+  /api/v1/tns/keepalive:
+    post:
+      tags:
+        - KeepAlive
+      description: >
+        This API is used for transmitting keep alive signal with topic names so
+        that TNS server update the the alive time of the topic not to be
+        expired.
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: topic_names
+          in: path
+          description: the names of active topics
+          required: true
+          type: string
+      responses:
+        '200':
+          description: SUCCESS
+        '404':
+          description: |-
+            NOT FOUND |
+            the invalid topic names are returned.
+          schema:
+            $ref: '#/definitions/keepalive'
+definitions:
+  topic:
+    required:
+      - name
+      - endpoint
+      - datamodel
+    properties:
+      topic:
+        type: string
+        example: /a/b/c
+      endpoint:
+        type: string
+        example: '123.123.123.123:55555'
+      datamodel:
+        type: string
+        example: GTC_Robot_0.0.1
+  keepalive_interval:
+    required:
+      - ka_interval
+    properties:
+      topic:
+        type: integer
+        example: 180
+  keepalive:
+    required:
+      - topic_names
+    properties:
+      topic_names:
+        type: string
+        example: '/a/b/c, /a/b/d'
+  discovery:
+    $ref: '#/definitions/topic'
