@@ -157,7 +157,7 @@ func keepAliveTimerLoop(interval uint) {
 	timeDurationSec := time.Duration(interval) * time.Second
 	ticker := time.NewTicker(timeDurationSec)
 
-	for _ = range ticker.C {
+	for range ticker.C {
 		kaInfo.Lock()
 		for topic, timestamp := range kaInfo.table {
 			// Remove expired topics

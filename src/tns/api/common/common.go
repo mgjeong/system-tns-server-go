@@ -93,9 +93,9 @@ func convertToHttpStatusCode(err error) int {
 		code = http.StatusConflict // 409
 	case errors.InternalServerError:
 		code = http.StatusInternalServerError // 500
-	// case errors.DBConnectionError,
-	//     errors.DBOperationError:
-	//     code = http.StatusServiceUnavailable // 503
+		// case errors.DBConnectionError,
+		//     errors.DBOperationError:
+		//     code = http.StatusServiceUnavailable // 503
 	}
 
 	return code

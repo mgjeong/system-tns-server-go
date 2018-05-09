@@ -4,7 +4,4 @@ port = 48323
 keepAliveInterval = 600 # Second
 
 [database]
-ip = "127.0.0.1"
-port = 27017
-name = "TnsTopicDB"
-collection = "TOPIC"
+name = "TnsServerDB"

@@ -30,10 +30,7 @@ type Config struct {
 		KeepAliveInterval uint
 	}
 	Database struct {
-		Ip         string
-		Port       uint
-		Name       string
-		Collection string
+		Name string
 	}
 }
 
