@@ -20,10 +20,11 @@ paths:
         endpoint address such as IP and Port and data model ID. Additionally,
         the API supports name matching or hierarchical topic discovery by using
         query statement. For example, you can retrive a name maching topic data
-        like "/api/v1/tns?name=/a/b. In this case, only the topic data having
-        /a/b as the name is returned. As for hierarchical topic discovery, you
-        can look it up like "/api/v1/tns?name=/a/b&hierarchical=yes". Then all
-        the multiple topic data having /a/b/ in the top fields can be returned. 
+        like "/api/v1/tns/topic?name=/a/b. In this case, only the topic data
+        having /a/b as the name is returned. As for hierarchical topic discovery,
+        you can look it up like "/api/v1/tns/topic?name=/a/b&hierarchical=yes".
+        Then all the multiple topic data having /a/b/ in the top fields can be
+        returned. 
       consumes:
         - application/json
       produces:
@@ -34,7 +35,9 @@ paths:
             SUCCESS | TNS server responses a result code with topic data as
             following example.
           schema:
-            $ref: '#/definitions/discovery'
+            $ref: '#/definitions/topics'
+        '400':
+          description: BAD REQUEST (eg. invalid query)
         '404':
           description: NOT FOUND (eg. topic not found)
         '500':
@@ -52,21 +55,12 @@ paths:
       produces:
         - application/json
       parameters:
-        - name: name
-          in: path
-          description: name of topic
+        - in: body
+          name: topic
+          description: the names of active topics
           required: true
-          type: string
-        - name: endpoint
-          in: path
-          description: 'endpoint address(ip,port) of publisher'
-          required: true
-          type: string
-        - name: datamodel
-          in: path
-          description: ID of AutomationML data model
-          required: true
-          type: string
+          schema:
+            $ref: "#/definitions/topic"
       responses:
         '201':
           description: CREATED
@@ -83,7 +77,7 @@ paths:
         - Unregistration
       description: >
         Topic data registred in TNS server is deleted by this reqeust. The
-        deliting topic is indicated by using query like
+        deleting topic is indicated by using query like
         "/api/v1/tns/topic?name=/a/b/c". Note that hierarchy or wildcard option
         is not supported for this API.
       responses:
@@ -106,11 +100,12 @@ paths:
       produces:
         - application/json
       parameters:
-        - name: topic_names
-          in: path
+        - in: body
+          name: topic_names
           description: the names of active topics
           required: true
-          type: string
+          schema:
+            $ref: '#/definitions/topic_names'
       responses:
         '200':
           description: SUCCESS
@@ -119,36 +114,50 @@ paths:
             NOT FOUND |
             the invalid topic names are returned.
           schema:
-            $ref: '#/definitions/keepalive'
+            type: object
+            properties:
+              topic_names:
+                $ref: '#/definitions/topic_names'
 definitions:
-  topic:
+  topic_info:
+    type: object
     required:
       - name
       - endpoint
       - datamodel
     properties:
-      topic:
+      name:
         type: string
-        example: /a/b/c
+        example: '/a/b/c'
       endpoint:
         type: string
         example: '123.123.123.123:55555'
       datamodel:
         type: string
-        example: GTC_Robot_0.0.1
+        example: 'GTC_Robot_0.0.1'
+  topic:
+    required:
+      - topic
+    properties:
+      topic:
+        $ref: '#/definitions/topic_info'
+  topics:
+    required:
+      - topics
+    properties:
+      topics:
+        type: array
+        items:
+          $ref: '#/definitions/topic_info'
   keepalive_interval:
     required:
       - ka_interval
     properties:
-      topic:
+      ka_interval:
         type: integer
         example: 180
-  keepalive:
-    required:
-      - topic_names
-    properties:
-      topic_names:
-        type: string
-        example: '/a/b/c, /a/b/d'
-  discovery:
-    $ref: '#/definitions/topic'
+  topic_names:
+    type: array
+    items:
+      type: string
+    example: ['/a/b/c', '/a/b/d']
