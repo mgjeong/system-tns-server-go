@@ -7,7 +7,7 @@ services:
     ports:
       - "48323:48323"
     volumes:
-      - /data/db
+      - "/tns-server/data/db:/data/db"
     container_name: tns-server
 ...
 
