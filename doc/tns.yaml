@@ -57,7 +57,7 @@ paths:
       parameters:
         - in: body
           name: topic
-          description: the names of active topics
+          description: information of topic to be registered
           required: true
           schema:
             $ref: "#/definitions/topic"
