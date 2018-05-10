@@ -29,6 +29,15 @@ paths:
         - application/json
       produces:
         - application/json
+      parameters:
+        - in: query
+          name: name
+          type: string
+          description: the name of topic for discovery
+        - in: query
+          name: hierarchical
+          type: string
+          description: option for hierarchical topic discovery
       responses:
         '200':
           description: >-
@@ -80,6 +89,11 @@ paths:
         deleting topic is indicated by using query like
         "/api/v1/tns/topic?name=/a/b/c". Note that hierarchy or wildcard option
         is not supported for this API.
+      parameters:
+        - in: query
+          name: name
+          type: string
+          description: the name of topic for unregistration
       responses:
         '200':
           description: SUCCESS
