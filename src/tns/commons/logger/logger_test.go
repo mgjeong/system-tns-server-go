@@ -31,14 +31,14 @@ func setUpLogging() (func(), *os.File, *os.File) {
 	r, w, _ := os.Pipe()
 	os.Stdout = w
 
-	loggers[INFO] = log.New(os.Stdout, "[INFO][EM]", logFlag)
-	loggers[DEBUG] = log.New(os.Stdout, "[DEBUG][EM]", logFlag)
-	loggers[ERROR] = log.New(os.Stdout, "[ERROR][EM]", logFlag)
+	loggers[INFO] = log.New(os.Stdout, "[INFO]"+TAG, logFlag)
+	loggers[DEBUG] = log.New(os.Stdout, "[DEBUG]"+TAG, logFlag)
+	loggers[ERROR] = log.New(os.Stdout, "[ERROR]"+TAG, logFlag)
 	return func() {
 		os.Stdout = oldStdout
-		loggers[INFO] = log.New(os.Stdout, "[INFO][EM]", logFlag)
-		loggers[DEBUG] = log.New(os.Stdout, "[DEBUG][EM]", logFlag)
-		loggers[ERROR] = log.New(os.Stdout, "[ERROR][EM]", logFlag)
+		loggers[INFO] = log.New(os.Stdout, "[INFO]"+TAG, logFlag)
+		loggers[DEBUG] = log.New(os.Stdout, "[DEBUG]"+TAG, logFlag)
+		loggers[ERROR] = log.New(os.Stdout, "[ERROR]"+TAG, logFlag)
 	}, r, w
 }
 
@@ -57,9 +57,9 @@ func TestLogger(t *testing.T) {
 
 	testStr := "test"
 	testCase := []testInfo{
-		{"INFO", "[INFO][EM]", "[" + testStr + "]\n"},
-		{"DEBUG", "[DEBUG][EM]", "[" + testStr + "]\n"},
-		{"ERROR", "[ERROR][EM]", "[" + testStr + "]\n"},
+		{"INFO", "[INFO]" + TAG, "[" + testStr + "]\n"},
+		{"DEBUG", "[DEBUG]" + TAG, "[" + testStr + "]\n"},
+		{"ERROR", "[ERROR]" + TAG, "[" + testStr + "]\n"},
 	}
 
 	for i, test := range testCase {
