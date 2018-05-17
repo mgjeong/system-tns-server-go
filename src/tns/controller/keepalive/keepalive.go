@@ -109,7 +109,7 @@ func (Executor) HandlePing(body string) (map[string]interface{}, error) {
 	topicNamesInterface, exists := bodyMap["topic_names"].([]interface{})
 	if !exists {
 		logger.Logging(logger.DEBUG, "'topic_names' does not present in body")
-		return nil, errors.InvalidJSON{"'topic_names' field is required"}
+		return nil, errors.InvalidParam{"'topic_names' field is required"}
 	}
 
 	topicNames := make([]string, len(topicNamesInterface))
