@@ -18,11 +18,11 @@
 package topic
 
 import (
-	mgo "gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 	"strings"
 	"tns/commons/errors"
 	"tns/commons/logger"
+	mgo "tns/db/wrapper"
 )
 
 const (
@@ -50,9 +50,16 @@ type Topic struct {
 }
 
 var (
-	mgoSession         *mgo.Session
-	mgoTopicCollection *mgo.Collection
+	mgoDial            mgo.Connection
+	mgoSession         mgo.Session
+	mgoTopicCollection mgo.Collection
 )
+
+func init() {
+	mgoDial = mgo.MongoDial{}
+	mgoSession = mgo.MongoSession{}
+	mgoTopicCollection = mgo.MongoCollection{}
+}
 
 func (topic Topic) convertToMap() map[string]interface{} {
 	return map[string]interface{}{
@@ -63,7 +70,7 @@ func (topic Topic) convertToMap() map[string]interface{} {
 }
 
 func (m Executor) Connect(name string) error {
-	session, err := mgo.Dial(DB_URL)
+	session, err := mgoDial.Dial(DB_URL)
 	if err != nil {
 		logger.Logging(logger.ERROR, err.Error())
 		return err
