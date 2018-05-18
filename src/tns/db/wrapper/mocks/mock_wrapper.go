@@ -7,6 +7,7 @@ package mock_wrapper
 import (
 	gomock "github.com/golang/mock/gomock"
 	reflect "reflect"
+	. "tns/db/wrapper"
 )
 
 // MockSession is a mock of Session interface

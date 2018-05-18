@@ -57,8 +57,6 @@ var (
 
 func init() {
 	mgoDial = mgo.MongoDial{}
-	mgoSession = mgo.MongoSession{}
-	mgoTopicCollection = mgo.MongoCollection{}
 }
 
 func (topic Topic) convertToMap() map[string]interface{} {
@@ -91,17 +89,17 @@ func (m Executor) Close() {
 func (m Executor) CreateTopic(properties map[string]interface{}) error {
 	name, exists := properties["name"].(string)
 	if !exists {
-		return errors.InvalidJSON{"'name' field is required"}
+		return errors.InvalidParam{"'name' field is required"}
 	}
 
 	endpoint, exists := properties["endpoint"].(string)
 	if !exists {
-		return errors.InvalidJSON{"'endpoint' field is required"}
+		return errors.InvalidParam{"'endpoint' field is required"}
 	}
 
 	datamodel, exists := properties["datamodel"].(string)
 	if !exists {
-		return errors.InvalidJSON{"'datamodel' field is required"}
+		return errors.InvalidParam{"'datamodel' field is required"}
 	}
 
 	exists, err := m.isTopicNameExists(name)
