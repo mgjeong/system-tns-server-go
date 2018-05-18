@@ -18,10 +18,10 @@
 package api
 
 import (
-	"os"
 	"github.com/golang/mock/gomock"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"testing"
 	kaApiMock "tns/api/keepalive/mocks"
 	topicApiMock "tns/api/topic/mocks"

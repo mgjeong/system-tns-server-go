@@ -18,20 +18,13 @@
 package topic
 
 import (
+	"github.com/golang/mock/gomock"
 	"gopkg.in/mgo.v2/bson"
-	"tns/commons/errors"
-	// "strings"
-	// "tns/commons/logger"
 	"reflect"
+	"testing"
+	"tns/commons/errors"
 	mgo "tns/db/wrapper"
 	mgoMock "tns/db/wrapper/mocks"
-
-	"github.com/golang/mock/gomock"
-
-	"testing"
-	// "tns/commons/errors"
-	// kaControllerMock "tns/controller/keepalive/mocks"
-	// topicDbMock "tns/db/topic/mocks"
 )
 
 var Handler Command
