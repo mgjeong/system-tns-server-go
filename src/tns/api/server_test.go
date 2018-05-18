@@ -18,6 +18,7 @@
 package api
 
 import (
+	"os"
 	"github.com/golang/mock/gomock"
 	"net/http"
 	"net/http/httptest"
@@ -88,4 +89,47 @@ func TestCallServeHTTPWithKeepAliveUrl(t *testing.T) {
 	)
 
 	Handler.ServeHTTP(w, req)
+}
+
+func TestCallRead(t *testing.T) {
+	tomlFile, err := os.Create("test.toml")
+	if err != nil {
+		t.Error("Create failed")
+	}
+	defer os.Remove(tomlFile.Name())
+
+	_, err = tomlFile.Write([]byte("[server]\nip = \"0.0.0.0\""))
+	if err != nil {
+		t.Error("Write failed")
+	}
+
+	config = Config{}
+	config.Read(tomlFile.Name())
+}
+
+func TestCallRead_OpenFailed(t *testing.T) {
+	config = Config{}
+	err := config.Read("nonExistsFile")
+	if err == nil {
+		t.Error("Read did not return an error")
+	}
+}
+
+func TestCallRead_DecodeFailed(t *testing.T) {
+	tomlFile, err := os.Create("test.toml")
+	if err != nil {
+		t.Error("Create failed")
+	}
+	defer os.Remove(tomlFile.Name())
+
+	_, err = tomlFile.Write([]byte("[server]\nip = invalid toml"))
+	if err != nil {
+		t.Error("Write failed")
+	}
+
+	config = Config{}
+	err = config.Read(tomlFile.Name())
+	if err == nil {
+		t.Error("Read did not return an error")
+	}
 }
