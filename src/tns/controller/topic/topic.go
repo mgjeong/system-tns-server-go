@@ -28,7 +28,7 @@ import (
 type Command interface {
 	CreateTopic(body string) (map[string]interface{}, error)
 	ReadTopic(name string, hierarchical bool) (map[string]interface{}, error)
-	DelteTopic(name string) error
+	DeleteTopic(name string) error
 }
 
 // Executor implements the Command interface.
@@ -107,7 +107,7 @@ func (Executor) ReadTopic(name string, hierarchical bool) (map[string]interface{
 	return resp, nil
 }
 
-func (Executor) DelteTopic(name string) error {
+func (Executor) DeleteTopic(name string) error {
 	logger.Logging(logger.DEBUG, "IN")
 	defer logger.Logging(logger.DEBUG, "OUT")
 
