@@ -18,11 +18,11 @@
 package topic
 
 import (
-	mgo "gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 	"strings"
 	"tns/commons/errors"
 	"tns/commons/logger"
+	mgo "tns/db/wrapper"
 )
 
 const (
@@ -50,9 +50,14 @@ type Topic struct {
 }
 
 var (
-	mgoSession         *mgo.Session
-	mgoTopicCollection *mgo.Collection
+	mgoDial            mgo.Connection
+	mgoSession         mgo.Session
+	mgoTopicCollection mgo.Collection
 )
+
+func init() {
+	mgoDial = mgo.MongoDial{}
+}
 
 func (topic Topic) convertToMap() map[string]interface{} {
 	return map[string]interface{}{
@@ -63,7 +68,7 @@ func (topic Topic) convertToMap() map[string]interface{} {
 }
 
 func (m Executor) Connect(name string) error {
-	session, err := mgo.Dial(DB_URL)
+	session, err := mgoDial.Dial(DB_URL)
 	if err != nil {
 		logger.Logging(logger.ERROR, err.Error())
 		return err
@@ -84,17 +89,17 @@ func (m Executor) Close() {
 func (m Executor) CreateTopic(properties map[string]interface{}) error {
 	name, exists := properties["name"].(string)
 	if !exists {
-		return errors.InvalidJSON{"'name' field is required"}
+		return errors.InvalidParam{"'name' field is required"}
 	}
 
 	endpoint, exists := properties["endpoint"].(string)
 	if !exists {
-		return errors.InvalidJSON{"'endpoint' field is required"}
+		return errors.InvalidParam{"'endpoint' field is required"}
 	}
 
 	datamodel, exists := properties["datamodel"].(string)
 	if !exists {
-		return errors.InvalidJSON{"'datamodel' field is required"}
+		return errors.InvalidParam{"'datamodel' field is required"}
 	}
 
 	exists, err := m.isTopicNameExists(name)
