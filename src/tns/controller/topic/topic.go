@@ -55,13 +55,13 @@ func (Executor) CreateTopic(body string) (map[string]interface{}, error) {
 	topic, exists := bodyMap["topic"].(map[string]interface{})
 	if !exists {
 		logger.Logging(logger.DEBUG, "'topic' does not present in body")
-		return nil, errors.InvalidJSON{"'topic' field is required"}
+		return nil, errors.InvalidParam{"'topic' field is required"}
 	}
 
 	name, exists := topic["name"].(string)
 	if !exists {
 		logger.Logging(logger.DEBUG, "'name' does not present in body")
-		return nil, errors.InvalidJSON{"'name' field is required"}
+		return nil, errors.InvalidParam{"'name' field is required"}
 	}
 
 	err = topicDbExecutor.CreateTopic(topic)
