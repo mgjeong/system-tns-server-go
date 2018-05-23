@@ -1,7 +1,7 @@
 System TNS Server
 =======================================
 
-...
+This provides functionalities to register, retreive, unregister topic information that could be used for EZMQ Publishers/Subscribers.
 
 ## Prerequisites ##
 - docker-ce
@@ -41,11 +41,11 @@ Required options to run Docker image
 
 You can execute it with a Docker image as follows:
 ```shell
-$ docker run -it -p 48323:48323 -v /data/db:/data/db system-tns-server-go
+$ docker run -it -p 48323:48323 -v /tns-server/data/db:/data/db system-tns-server-go
 ```
 If it succeeds, you can see log messages on your screen as follows:
 ```shell
-$ docker run -it -p 48323:48323 -v /data/db:/data/db system-tns-server-go
+$ docker run -it -p 48323:48323 -v /tns-server/data/db:/data/db system-tns-server-go
 2018-05-08T06:46:02.558+0000 I CONTROL  [initandlisten] MongoDB starting : pid=6 port=27017 dbpath=/data/db 64-bit host=50db434b5682
 2018-05-08T06:46:02.558+0000 I CONTROL  [initandlisten] db version v3.4.4
 2018-05-08T06:46:02.558+0000 I CONTROL  [initandlisten] git version: 888390515874a9debd1b6c5d36559ca86b44babd
@@ -76,5 +76,3 @@ TNS Server provides a set of REST APIs for its operations. Descriptions for the 
 - **[tns.yaml](https://github.sec.samsung.net/RS7-EdgeComputing/system-tns-server-go/blob/master/doc/tns.yaml)**
 
 Note that you can visit [Swagger Editor](https://editor.swagger.io/) to graphically investigate the REST APIs in YAML.
-
-...

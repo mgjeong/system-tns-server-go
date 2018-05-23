@@ -145,7 +145,7 @@ func handleDeleteReq(w http.ResponseWriter, req *http.Request) {
 		}
 	}
 
-	err := topicExecutor.DelteTopic(name)
+	err := topicExecutor.DeleteTopic(name)
 	if err != nil {
 		common.WriteError(w, err)
 		return

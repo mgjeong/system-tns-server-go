@@ -145,7 +145,7 @@ func TestCallReadTopic(t *testing.T) {
 	}
 }
 
-func TestCallDelteTopic(t *testing.T) {
+func TestCallDeleteTopic(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
@@ -176,7 +176,7 @@ func TestCallDelteTopic(t *testing.T) {
 				kaControllerMockObj.EXPECT().DeleteTopic(topicName)
 			}
 
-			err := Handler.DelteTopic(topicName)
+			err := Handler.DeleteTopic(topicName)
 			if reflect.TypeOf(err) != reflect.TypeOf(tc.expectedError) {
 				t.Errorf("Expected Error: %s, Actual: %s", tc.expectedError, err)
 			}
