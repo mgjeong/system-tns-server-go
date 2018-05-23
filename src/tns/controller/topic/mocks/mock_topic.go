@@ -75,14 +75,14 @@ func (mr *MockCommandMockRecorder) ReadTopic(name, hierarchical interface{}) *go
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ReadTopic", reflect.TypeOf((*MockCommand)(nil).ReadTopic), name, hierarchical)
 }
 
-// DelteTopic mocks base method
-func (m *MockCommand) DelteTopic(name string) error {
-	ret := m.ctrl.Call(m, "DelteTopic", name)
+// DeleteTopic mocks base method
+func (m *MockCommand) DeleteTopic(name string) error {
+	ret := m.ctrl.Call(m, "DeleteTopic", name)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
-// DelteTopic indicates an expected call of DelteTopic
-func (mr *MockCommandMockRecorder) DelteTopic(name interface{}) *gomock.Call {
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DelteTopic", reflect.TypeOf((*MockCommand)(nil).DelteTopic), name)
+// DeleteTopic indicates an expected call of DeleteTopic
+func (mr *MockCommandMockRecorder) DeleteTopic(name interface{}) *gomock.Call {
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteTopic", reflect.TypeOf((*MockCommand)(nil).DeleteTopic), name)
 }

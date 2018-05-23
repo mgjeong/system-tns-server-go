@@ -219,7 +219,7 @@ func TestCallHandleDelete(t *testing.T) {
 	name := "/a"
 
 	gomock.InOrder(
-		topicCtrlrMockObj.EXPECT().DelteTopic(name).Return(nil),
+		topicCtrlrMockObj.EXPECT().DeleteTopic(name).Return(nil),
 	)
 
 	req := httptest.NewRequest("DELETE", topicUrl+"?name="+name, nil)
@@ -245,7 +245,7 @@ func TestCallHandleDeleteWithNonExistTopic(t *testing.T) {
 	name := "/a"
 
 	gomock.InOrder(
-		topicCtrlrMockObj.EXPECT().DelteTopic(name).Return(errors.NotFound{}),
+		topicCtrlrMockObj.EXPECT().DeleteTopic(name).Return(errors.NotFound{}),
 	)
 
 	req := httptest.NewRequest("DELETE", topicUrl+"?name="+name, nil)
