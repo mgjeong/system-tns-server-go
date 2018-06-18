@@ -20,9 +20,13 @@ export GOPATH=$PWD
 
 go get github.com/golang/mock/gomock
 
-pkg_list=("tns/api" "tns/api/topic" "tns/api/keepalive" \
-          "tns/commons/errors" "tns/commons/logger" \
-          "tns/controller/topic" "tns/controller/keepalive" \
+pkg_list=("tns/api" \
+          "tns/api/topic" \
+          "tns/api/keepalive" \
+          "tns/commons/errors" \
+          "tns/commons/logger" \
+          "tns/controller/topic" \
+          "tns/controller/keepalive" \
           "tns/db/topic")
 
 function func_cleanup(){
@@ -32,14 +36,14 @@ function func_cleanup(){
 
 count=0
 for pkg in "${pkg_list[@]}"; do
- go test -c -v -gcflags "-N -l" $pkg
- go test -coverprofile=$count.cover.out $pkg
- if [ $? -ne 0 ]; then
-    echo "Unittest is failed."
-    func_cleanup
-    exit 1
- fi
- count=$count.0
+    go test -c -v -gcflags "-N -l" $pkg
+    go test -coverprofile=$count.cover.out $pkg
+    if [ $? -ne 0 ]; then
+        echo "Unittest is failed."
+        func_cleanup
+        exit 1
+    fi
+    count=$count.0
 done
 
 echo "mode: set" > coverage.out && cat *.cover.out | grep -v mode: | sort -r | \

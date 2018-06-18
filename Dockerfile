@@ -23,7 +23,7 @@ ENV APP=tns-server
 ENV APP_PORT=48323
 
 # install MongoDB
-RUN apk add --no-cache mongodb bash && \
+RUN apk add --no-cache mongodb && \
     rm -rf /var/cache/apk/*
 
 # make mongodb volume
