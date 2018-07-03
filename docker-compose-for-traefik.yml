@@ -1,0 +1,19 @@
+## tns-server docker compose file to work on traefik(reverse proxy)
+
+version: '2'
+services:
+  tns:
+    image: docker.sec.samsung.net:5000/edge/system-tns-server-go/ubuntu_x86_64
+    container_name: tns-server
+    volumes:
+      - "/tns-server/data/db:/data/db"
+    labels:
+      - "traefik.frontend.rule=PathPrefixStrip: /tns-server"
+      - "traefik.port=48323"
+    networks:
+      - proxy
+
+networks:
+  proxy:
+    external: true
+...
