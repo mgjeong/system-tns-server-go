@@ -21,7 +21,9 @@
 # Ignore downloaded packages
 src/github.com/
 src/gopkg.in/
+src/golang.org/
 
 # Ignore output files
 pkg/
 tns-server
+coverall.html
