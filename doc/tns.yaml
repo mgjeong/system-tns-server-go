@@ -149,6 +149,10 @@ definitions:
       datamodel:
         type: string
         example: 'GTC_Robot_0.0.1'
+      secured:
+        type: boolean
+        example: false
+        description: 'default value is false'
   topic:
     required:
       - topic
