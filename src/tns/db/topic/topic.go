@@ -47,6 +47,7 @@ type Topic struct {
 	Name      string `bson:"name"`
 	Endpoint  string `bson:"endpoint"`
 	Datamodel string `bson:"datamodel"`
+	Secured   bool   `bson:"secured"`
 }
 
 var (
@@ -64,6 +65,7 @@ func (topic Topic) convertToMap() map[string]interface{} {
 		"name":      topic.Name,
 		"endpoint":  topic.Endpoint,
 		"datamodel": topic.Datamodel,
+		"secured":   topic.Secured,
 	}
 }
 
@@ -102,6 +104,11 @@ func (m Executor) CreateTopic(properties map[string]interface{}) error {
 		return errors.InvalidParam{"'datamodel' field is required"}
 	}
 
+	secured, exists := properties["secured"].(bool)
+	if !exists {
+		secured = false
+	}
+
 	exists, err := m.isTopicNameExists(name)
 	if err != nil {
 		logger.Logging(logger.ERROR, "isTopicNameExists failed")
@@ -117,6 +124,7 @@ func (m Executor) CreateTopic(properties map[string]interface{}) error {
 		Name:      name,
 		Endpoint:  endpoint,
 		Datamodel: datamodel,
+		Secured:   secured,
 	}
 
 	if err := mgoTopicCollection.Insert(topic); err != nil {
