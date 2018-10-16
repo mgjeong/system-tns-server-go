@@ -73,7 +73,7 @@ func RunServer(filePath string) {
 }
 
 func (RequestHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
-	logger.Logging(logger.DEBUG, "IN receive msg", req.Method, req.URL.Path)
+	logger.Logging(logger.DEBUG, "IN receive msg", req.Method, req.URL.String())
 	defer logger.Logging(logger.DEBUG, "OUT")
 
 	switch url := req.URL.Path; {

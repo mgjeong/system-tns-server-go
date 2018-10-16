@@ -18,11 +18,13 @@
 package topic
 
 import (
-	"gopkg.in/mgo.v2/bson"
+	"regexp"
 	"strings"
 	"tns/commons/errors"
 	"tns/commons/logger"
 	mgo "tns/db/wrapper"
+
+	"gopkg.in/mgo.v2/bson"
 )
 
 const (
@@ -135,9 +137,7 @@ func (m Executor) CreateTopic(properties map[string]interface{}) error {
 }
 
 func (m Executor) DeleteTopic(name string) error {
-	pattern := "^" + name + "$"
-	query := bson.M{"name": bson.RegEx{Pattern: pattern}}
-
+	query := bson.M{"name": name}
 	err := mgoTopicCollection.Remove(query)
 	if err != nil {
 		if err == mgo.ErrNotFound {
@@ -152,8 +152,7 @@ func (m Executor) DeleteTopic(name string) error {
 }
 
 func (m Executor) ReadTopicAll() ([]map[string]interface{}, error) {
-	pattern := "."
-	topics, err := m.readTopicFromDB(pattern)
+	topics, err := m.readTopicFromDB(nil)
 	if err != nil {
 		logger.Logging(logger.ERROR, "readTopicFromDB failed")
 		return nil, err
@@ -173,12 +172,26 @@ func (m Executor) ReadTopic(name string, hierarchical bool) ([]map[string]interf
 		return m.readTopicWildcard(name)
 	}
 
-	pattern := "^" + name + "$" // One exactly matched
+	query := bson.M{}
 	if hierarchical {
-		pattern += "|^" + name + "/" // All started with 'name'
+		// add escapes characters before special characters for regular expression
+		len := len(name)
+		for i := 0; i < len; i++ {
+			matched, _ := regexp.MatchString("[^a-zA-Z0-9]", string(name[i]))
+			if matched {
+				name = name[:i] + "\\" + name[i:]
+				len++
+				i++
+			}
+		}
+
+		pattern := "^" + name + "$|^" + name + "/" // All started with 'name'
+		query = bson.M{"name": bson.RegEx{Pattern: pattern}}
+	} else {
+		query = bson.M{"name": name} // One exactly matched
 	}
 
-	topics, err := m.readTopicFromDB(pattern)
+	topics, err := m.readTopicFromDB(query)
 	if err != nil {
 		logger.Logging(logger.ERROR, "readTopicFromDB failed")
 		return nil, err
@@ -187,10 +200,8 @@ func (m Executor) ReadTopic(name string, hierarchical bool) ([]map[string]interf
 	return topics, nil
 }
 
-func (m Executor) readTopicFromDB(pattern string) ([]map[string]interface{}, error) {
-	query := bson.M{"name": bson.RegEx{Pattern: pattern}}
+func (m Executor) readTopicFromDB(query bson.M) ([]map[string]interface{}, error) {
 	topics := []Topic{}
-
 	err := mgoTopicCollection.Find(query).All(&topics)
 	if err != nil {
 		logger.Logging(logger.ERROR, "Failed to Find All on mongoDB: "+err.Error())
@@ -214,8 +225,7 @@ func (m Executor) readTopicWildcard(name string) ([]map[string]interface{}, erro
 }
 
 func (m Executor) isTopicNameExists(name string) (bool, error) {
-	pattern := "^" + name + "$"
-	query := bson.M{"name": bson.RegEx{Pattern: pattern}}
+	query := bson.M{"name": name}
 
 	hit, err := mgoTopicCollection.Find(query).Count()
 	if err != nil {
