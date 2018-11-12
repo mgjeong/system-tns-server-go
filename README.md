@@ -1,7 +1,7 @@
 System TNS Server
 =======================================
 
-This provides functionalities to register, retreive, unregister topic information that could be used for EZMQ Publishers/Subscribers.
+This provides functionalities to register, retreive, unregister topic information that could be used for ezMQ-plus publishers/subscribers.
 
 ## Prerequisites ##
 - docker-ce

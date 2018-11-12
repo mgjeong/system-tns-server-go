@@ -18,13 +18,15 @@
 package topic
 
 import (
-	"github.com/golang/mock/gomock"
-	"gopkg.in/mgo.v2/bson"
 	"reflect"
+	"regexp"
 	"testing"
 	"tns/commons/errors"
 	mgo "tns/db/wrapper"
 	mgoMock "tns/db/wrapper/mocks"
+
+	"github.com/golang/mock/gomock"
+	"gopkg.in/mgo.v2/bson"
 )
 
 var Handler Command
@@ -100,7 +102,7 @@ func TestCallCreateTopic(t *testing.T) {
 	mgoTopicCollection = mgoCollectionMockObj
 
 	dummyProperties := map[string]interface{}{"name": "/a", "endpoint": "0.0.0.0:1234", "datamodel": "test_0.0.1"}
-	dummyQuery := bson.M{"name": bson.RegEx{Pattern: "^/a$"}}
+	dummyQuery := bson.M{"name": "/a"}
 	dummpyTopic := Topic{
 		Name:      "/a",
 		Endpoint:  "0.0.0.0:1234",
@@ -139,9 +141,9 @@ func TestCallCreateTopicWithInvalidRequest(t *testing.T) {
 		{"InvalidParam_name", map[string]interface{}{"endpoint": "0.0.0.0:1234", "datamodel": "test_0.0.1"}, nil, Topic{}, errors.InvalidParam{}},
 		{"InvalidParam_endpoint", map[string]interface{}{"name": "/a", "datamodel": "test_0.0.1"}, nil, Topic{}, errors.InvalidParam{}},
 		{"InvalidParam_datamodel", map[string]interface{}{"name": "/a", "endpoint": "0.0.0.0:1234"}, nil, Topic{}, errors.InvalidParam{}},
-		{"DbFailed_Find", map[string]interface{}{"name": "/a", "endpoint": "0.0.0.0:1234", "datamodel": "test_0.0.1"}, bson.M{"name": bson.RegEx{Pattern: "^/a$"}}, Topic{}, errors.InternalServerError{}},
-		{"TopicAlreadyExists", map[string]interface{}{"name": "/a", "endpoint": "0.0.0.0:1234", "datamodel": "test_0.0.1"}, bson.M{"name": bson.RegEx{Pattern: "^/a$"}}, Topic{}, errors.Conflict{}},
-		{"DbFailed_Insert", map[string]interface{}{"name": "/a", "endpoint": "0.0.0.0:1234", "datamodel": "test_0.0.1"}, bson.M{"name": bson.RegEx{Pattern: "^/a$"}}, Topic{Name: "/a", Endpoint: "0.0.0.0:1234", Datamodel: "test_0.0.1"}, errors.InternalServerError{}},
+		{"DbFailed_Find", map[string]interface{}{"name": "/a", "endpoint": "0.0.0.0:1234", "datamodel": "test_0.0.1"}, bson.M{"name": "/a"}, Topic{}, errors.InternalServerError{}},
+		{"TopicAlreadyExists", map[string]interface{}{"name": "/a", "endpoint": "0.0.0.0:1234", "datamodel": "test_0.0.1"}, bson.M{"name": "/a"}, Topic{}, errors.Conflict{}},
+		{"DbFailed_Insert", map[string]interface{}{"name": "/a", "endpoint": "0.0.0.0:1234", "datamodel": "test_0.0.1"}, bson.M{"name": "/a"}, Topic{Name: "/a", Endpoint: "0.0.0.0:1234", Datamodel: "test_0.0.1"}, errors.InternalServerError{}},
 	}
 
 	for _, tc := range testCases {
@@ -183,7 +185,7 @@ func TestCallDeleteTopic(t *testing.T) {
 	mgoTopicCollection = mgoCollectionMockObj
 
 	dummyName := "/a"
-	dummyQuery := bson.M{"name": bson.RegEx{Pattern: "^/a$"}}
+	dummyQuery := bson.M{"name": dummyName}
 
 	testCases := []struct {
 		name          string
@@ -219,8 +221,6 @@ func TestCallReadTopicAll(t *testing.T) {
 	// pass mockObj to a real object.
 	mgoTopicCollection = mgoCollectionMockObj
 
-	dummyQuery := bson.M{"name": bson.RegEx{Pattern: "."}}
-
 	testCases := []struct {
 		name          string
 		mockRetError  error
@@ -235,7 +235,7 @@ func TestCallReadTopicAll(t *testing.T) {
 			outTopics := []Topic{{Name: "/a", Endpoint: "0.0.0.0:1234", Datamodel: "test_0.0.1"}}
 
 			gomock.InOrder(
-				mgoCollectionMockObj.EXPECT().Find(dummyQuery).Return(mgoQueryMockObj),
+				mgoCollectionMockObj.EXPECT().Find(nil).Return(mgoQueryMockObj), // nil query to read all
 				mgoQueryMockObj.EXPECT().All(gomock.Any()).SetArg(0, outTopics).Return(tc.mockRetError),
 			)
 
@@ -274,12 +274,25 @@ func TestCallReadTopic(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			if tc.name != "InvalidQuery_HierarchicalAndWildcard" && tc.name != "Success_Wildcard" {
-				pattern := "^" + tc.topicName + "$"
+				dummyQuery := bson.M{}
 				if tc.hierarchical {
-					pattern += "|^" + tc.topicName + "/"
+					name := tc.topicName
+					len := len(name)
+					for i := 0; i < len; i++ {
+						matched, _ := regexp.MatchString("[^a-zA-Z0-9]", string(name[i]))
+						if matched {
+							name = name[:i] + "\\" + name[i:]
+							len++
+							i++
+						}
+					}
+
+					pattern := "^" + name + "$|^" + name + "/"
+					dummyQuery = bson.M{"name": bson.RegEx{Pattern: pattern}}
+				} else {
+					dummyQuery = bson.M{"name": tc.topicName}
 				}
 
-				dummyQuery := bson.M{"name": bson.RegEx{Pattern: pattern}}
 				outTopics := []Topic{{Name: "/a", Endpoint: "0.0.0.0:1234", Datamodel: "test_0.0.1"}}
 
 				gomock.InOrder(
