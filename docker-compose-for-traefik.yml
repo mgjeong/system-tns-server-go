@@ -3,7 +3,7 @@
 version: '2'
 services:
   tns:
-    image: docker.sec.samsung.net:5000/edge/system-tns-server-go/ubuntu_x86_64:latest
+    image: ${edgexfoundry}/system-tns-server-go/ubuntu_x86_64:latest
     container_name: tns-server
     volumes:
       - "/tns-server/data/db:/data/db"

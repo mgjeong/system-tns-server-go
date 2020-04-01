@@ -73,6 +73,6 @@ $ docker run -it -p 48323:48323 -v /tns-server/data/db:/data/db system-tns-serve
 ```
 ## API Document ##
 TNS Server provides a set of REST APIs for its operations. Descriptions for the APIs are stored in <root>/doc folder.
-- **[tns.yaml](https://github.sec.samsung.net/RS7-EdgeComputing/system-tns-server-go/blob/master/doc/tns.yaml)**
+- **[tns.yaml](https://github.com/mgjeong/system-tns-server-go/blob/master/doc/tns.yaml)**
 
 Note that you can visit [Swagger Editor](https://editor.swagger.io/) to graphically investigate the REST APIs in YAML.
